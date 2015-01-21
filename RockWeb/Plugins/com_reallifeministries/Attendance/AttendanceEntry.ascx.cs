@@ -13,6 +13,7 @@ using Rock.Attribute;
 using Rock.Constants;
 using Rock.Web.UI;
 using Rock.Web.UI.Controls;
+using Rock.Web.Cache;
 
 namespace com.reallifeministries.Attendance
 {
@@ -45,9 +46,7 @@ namespace com.reallifeministries.Attendance
        
         protected void BindCampusPicker()
         {
-
-            //campusPicker.Campuses = ctx.Campuses.ToList();
-            
+            ddlCampus.Campuses = CampusCache.All();
         }
 
 
@@ -140,7 +139,12 @@ namespace com.reallifeministries.Attendance
                 Rock.Model.Attendance attendance = ctx.Attendances.Create();
                 attendance.PersonAlias = person.PrimaryAlias;
                 attendance.StartDateTime = (DateTime)dpAttendanceDate.SelectedDate;
-                attendance.CampusId = campusPicker.SelectedCampusId;
+                var campus_id = ddlCampus.SelectedValue;
+                if (!String.IsNullOrEmpty( campus_id ))
+                {
+                    attendance.CampusId = Convert.ToInt32(campus_id);
+                }
+                
                 attendanceService.Add( attendance );
             }
 

@@ -13,7 +13,7 @@
             <fieldset>
                 <legend>Attendance Info</legend>
                 <Rock:DatePicker runat="server"  id="dpAttendanceDate" Required="true" Label="Attended Date" />
-                <Rock:CampusPicker runat="server" ID="campusPicker" />
+                <Rock:CampusPicker ID="ddlCampus" runat="server" Label="Campus" />
             </fieldset>                      
             <fieldset>
                 <legend>Search For Person</legend>                   
@@ -68,7 +68,7 @@
         var $dpAttendanceDate = $(<%= dpAttendanceDate.ClientID %>);
         var attendanceDateKey = 'attendance-attendedDate';
 
-        var $sbCampusPicker = $(<%= campusPicker.ClientID %>);
+        var $sbCampusPicker = $(<%= ddlCampus.ClientID %>);
         var campusKey = 'attendance-campus_id';
 
         if (!$dpAttendanceDate.val()) {
