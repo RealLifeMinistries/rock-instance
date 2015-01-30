@@ -21,7 +21,7 @@ namespace com.reallifeministries.Attendance
     /// Attendence Entry
     /// </summary>
     [Category( "Attendance" )]
-    [Description( "Attendance Entry" )]
+    [Description( "All Church Attendance" )]
     //[LinkedPage( "Admin Page" )]
     //[BooleanField( "Show Key Pad", "Show the number key pad on the search screen", false )]
     //[IntegerField( "Minimum Text Length", "Minimum length for text searches (defaults to 4).", false, 4 )]

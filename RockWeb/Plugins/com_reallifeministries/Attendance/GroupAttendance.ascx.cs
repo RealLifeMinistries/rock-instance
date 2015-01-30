@@ -21,8 +21,8 @@ namespace com.reallifeministries.Attendance
     /// <summary>
     /// Group Attendence Entry
     /// </summary>
-    [Category( "GroupAttendance" )]
-    [Description( "Group Attendance Entry" )]
+    [Category( "Attendance" )]
+    [Description( "Group Attendance Entry; Should be placed on a group detail page." )]
     [GroupField( "Group", "Either pick a specific group or choose <none> to have group be determined by the groupId page parameter" )]
     public partial class GroupAttendance : RockBlock
     {
