@@ -31,7 +31,57 @@ namespace com.reallifeministries.Attendance
         private DefinedValueCache _inactiveStatus = null;
         private bool _canView = false;
         private bool _takesAttendance = false;
-        private List<Rock.Model.Attendance> _attendances = new List<Rock.Model.Attendance>();
+        private List<Rock.Model.Attendance> _attendances = null;
+
+        protected bool wasAttendanceTaken
+        {
+            get
+            {
+                if (attendanceList != null)
+                {
+                    return attendanceList.Count > 0;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+
+        private List<Rock.Model.Attendance> attendanceList
+        {
+            get
+            {
+                if (_attendances != null)
+                {
+                    return _attendances;
+                }
+                else
+                {
+                    if (ViewState["attendanceIds"] != null)
+                    {
+                        var attendanceService = new AttendanceService( ctx );
+                        var attendanceIds = new List<int>( ((Array) ViewState["attendanceIds"]).OfType<int>().ToList() );
+                        _attendances = attendanceService.GetByIds( attendanceIds ).ToList();
+                        return _attendances;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+            }
+            set
+            {
+                _attendances = value;
+                if (value != null)
+                    ViewState["attendanceIds"] = (from a in value select a.Id).ToArray();
+                else
+                {
+                    ViewState["attendanceIds"] = null;
+                }
+            }
+        }
 
         protected override void OnInit( EventArgs e )
         {
@@ -69,33 +119,36 @@ namespace com.reallifeministries.Attendance
                     }
                 }
             }
-        }
 
-        protected bool attendanceTaken
-        {
-            get
-            {
-                return (_attendances != null) &&_attendances.Count > 0;
-            }
+            
         }
 
         protected void Page_Load( object sender, EventArgs e )
         {
             HandleNotification();
-            pnlForm.Visible = (_canView && _takesAttendance && !attendanceTaken);
-            pnlResults.Visible = attendanceTaken;
 
-            if (attendanceTaken)
-            {
-                rptAttendees.DataSource = _attendances;
-                rptAttendees.DataBind();
-
-            } else if (_canView && _takesAttendance && !IsPostBack)
+            if (_canView && _takesAttendance && !IsPostBack)
             {
                 BindPeopleList();
                 dpAttendanceDate.SelectedDate = DateTime.Now;
-            } 
-            
+            }
+        }
+
+        protected void Page_PreRender( object sender, EventArgs e )
+        {
+            BindVisibility();
+        }
+
+        protected void BindVisibility()
+        {
+            pnlResults.Visible = wasAttendanceTaken;
+            pnlForm.Visible = (_canView && _takesAttendance && !wasAttendanceTaken);
+        }
+
+        protected void BindAttendanceList()
+        {
+            rptAttendees.DataSource = attendanceList;
+            rptAttendees.DataBind();
         }
 
         protected void BindPeopleList()
@@ -155,7 +208,13 @@ namespace com.reallifeministries.Attendance
                 FlashMessage( "Your security level does not allow this action" , NotificationBoxType.Warning);
             }
         }
-
+        protected void btnReset_Click( object sender, EventArgs e )
+        {
+            resetCheckBoxes();
+            attendanceList = null;
+            BindAttendanceList();
+        }
+       
         protected void btnRecordAttendance_Click( object sender, EventArgs e )
         {
             if (dpAttendanceDate.SelectedDate != null)
@@ -171,29 +230,39 @@ namespace com.reallifeministries.Attendance
 
                 if (attendendPeopleIds.Count > 0)
                 {
-                    
-                        var attendanceService = new AttendanceService( ctx );
-                        var peopleService = new PersonService( ctx );
-                        var people = peopleService.GetByIds( attendendPeopleIds );
+                  
+                    var attendanceService = new AttendanceService( ctx );
+                    var peopleService = new PersonService( ctx );
+                    var people = peopleService.GetByIds( attendendPeopleIds );
+                    var attendances = new List<Rock.Model.Attendance>();
 
-                        foreach (Person person in people) {
-                            var attendance = ctx.Attendances.Create();
-                            attendance.PersonAlias = person.PrimaryAlias;
-                            attendance.Group = _group;
-                            // ADD GROUP LOCATION ?
-                            
-                            attendance.StartDateTime = (DateTime)dpAttendanceDate.SelectedDate;
+                    foreach (Person person in people) {
+                        var attendance = new Rock.Model.Attendance();
+                        attendance.PersonAlias = person.PrimaryAlias;
+                        attendance.Group = _group;
+                        // ADD GROUP LOCATION ?
+                        
+                        attendance.StartDateTime = (DateTime)dpAttendanceDate.SelectedDate;
+                        if (attendance.IsValid)
+                        {
                             attendanceService.Add( attendance );
-                            _attendances.Add( attendance );
+                            attendances.Add( attendance );
                         }
+                    }
 
-                        ctx.SaveChanges();
-                        FlashMessage( string.Format(
-                            "Attendance Recorded for {1} people: {0}", 
-                            dpAttendanceDate.SelectedDate.ToString(),
-                            attendendPeopleIds.Count
-                        ), NotificationBoxType.Success);
-                    
+                    ctx.SaveChanges();
+                    FlashMessage( string.Format(
+                        "Attendance Recorded for {1} people on {0}", 
+                        dpAttendanceDate.SelectedDate.Value.ToLongDateString(),
+                        attendendPeopleIds.Count
+                    ), NotificationBoxType.Success);
+
+
+                    attendanceList = attendances;
+
+                    BindAttendanceList();
+
+                    resetCheckBoxes();
                 }
                 else
                 {
@@ -205,6 +274,34 @@ namespace com.reallifeministries.Attendance
                 FlashMessage( "Attended Date is required" , NotificationBoxType.Danger );
             }
         }
-    }
+
+        protected void resetCheckBoxes()
+        {
+            foreach (ListItem item in cblMembers.Items)
+            {
+                item.Selected = false;
+            }
+        }
+        protected void rptAttendees_ItemCommand( object source, RepeaterCommandEventArgs e )
+        {
+            var attendId = Int32.Parse( e.CommandArgument.ToString() );
+            var attendanceService = new Rock.Model.AttendanceService( ctx );
+            var attendance = attendanceService.Get( attendId );
+            var newList = new List<Rock.Model.Attendance>();
+
+            attendanceService.Delete(attendance);
+            ctx.SaveChanges();
+            
+            foreach(var item in attendanceList) {
+                if (item.Id != attendId)
+                {
+                    newList.Add( item );
+                }
+            }
+
+            attendanceList = newList;
+            BindAttendanceList();           
+        }
+}
 
 }

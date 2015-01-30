@@ -10,18 +10,26 @@
                 <Rock:BootstrapButton Text="Record Attendance" runat="server" OnClick="btnRecordAttendance_Click" ID="btnRecordAttendance" CssClass='btn btn-primary' DataLoadingText="Saving..." />
           </asp:Panel>
           <asp:Panel runat="server" ID="pnlResults" Visible="false">
-              <asp:Repeater runat="server" ID="rptAttendees">
+              <h4>Attendees</h4>
+              <asp:Repeater runat="server" ID="rptAttendees" OnItemCommand="rptAttendees_ItemCommand">
                   <HeaderTemplate>
                       <ul>
                   </HeaderTemplate>
                   <ItemTemplate>
-                      <li><%= Eval("Person.FullName") %></li>
+                      <li><%# Eval("PersonAlias.Person.FullName")%>
+                          <Rock:BootstrapButton ID='btnUndo' runat="server" CommandName="Undo" CommandArgument='<%# Eval("Id")%>' 
+                              CssClass="btn btn-text">
+                              <i class='fa fa-ban'></i> Oops..
+                          </Rock:BootstrapButton>
+                      </li>
                   </ItemTemplate>
                   <FooterTemplate>
                       </ul>
                   </FooterTemplate>
               </asp:Repeater>
+              <Rock:BootstrapButton runat="server" CssClass="btn btn-primary" OnClick="btnReset_Click" ID="btnReset" Text="Record More Attendees" />
           </asp:Panel>
+         
         </Rock:PanelWidget> 
     </ContentTemplate>
 </Rock:RockUpdatePanel>
