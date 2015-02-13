@@ -13,12 +13,12 @@ using Rock.Model;
 using Rock.Web.Cache;
 using Rock.Workflow;
 
-namespace com.reallifeministries.RockExtensions
+namespace com.reallifeministries.RockExtensions.Workflow.Action
 {
     /// <summary>
     /// Activates a new activity for a given activity type
     /// </summary>
-    [Description( "Activates a new workflow instance." )]
+    [Description( "Activates a new workflow. The attributes from this current activity will be passed as attributes to the workflow." )]
     [Export( typeof( ActionComponent ) )]
     [ExportMetadata( "ComponentName", "Activate Workflow" )]
 
@@ -54,8 +54,8 @@ namespace com.reallifeministries.RockExtensions
                 action.AddLogEntry( "Invalid Workflow Property", true );
                 return false;
             }
-
-            var newWorkflow = Workflow.Activate( newWorkflowType, newWorkflowName );
+            
+            var newWorkflow = Rock.Model.Workflow.Activate( newWorkflowType, newWorkflowName );
             if (newWorkflow == null)
             {
                 action.AddLogEntry( "The Workflow could not be activated", true );
@@ -67,12 +67,12 @@ namespace com.reallifeministries.RockExtensions
                 currentActivity.LoadAttributes( rockContext );
             }
 
+            // Pass Attributes from current activity to workflow.
             foreach (string key in currentActivity.AttributeValues.Keys)
             {
                 newWorkflow.SetAttributeValue( key, currentActivity.GetAttributeValue(key) );
             }
-
-
+            
             if(newWorkflow.Process( rockContext, entity, out errorMessages )) 
             {
                 if (newWorkflow.IsPersisted || newWorkflowType.IsPersisted)
