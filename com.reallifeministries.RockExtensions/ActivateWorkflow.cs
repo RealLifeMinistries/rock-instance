@@ -37,7 +37,7 @@ namespace com.reallifeministries.RockExtensions
         public override bool Execute( RockContext rockContext, WorkflowAction action, Object entity, out List<string> errorMessages )
         {
             errorMessages = new List<string>();
-            Guid guid = GetAttributeValue( action, "Workflow" ).AsGuid();
+            var guid = GetAttributeValue( action, "Workflow" ).AsGuid();
             if (guid.IsEmpty())
             {
                 action.AddLogEntry( "Invalid Workflow Property", true );
@@ -47,7 +47,7 @@ namespace com.reallifeministries.RockExtensions
             var currentActivity = action.Activity;
             var currentWorkflow = action.Activity.Workflow;
             var newWorkflowType = new WorkflowTypeService( rockContext ).Get( guid );
-            var newWorkflowName = GetAttributeValue( "WorkflowName" );
+            var newWorkflowName = GetAttributeValue(action, "WorkflowName" );
 
             if (newWorkflowType == null)
             {
@@ -55,7 +55,7 @@ namespace com.reallifeministries.RockExtensions
                 return false;
             }
 
-            var newWorkflow = Workflow.Activate( newWorkflowType, GetAttributeValue("WorkflowName") );
+            var newWorkflow = Workflow.Activate( newWorkflowType, newWorkflowName );
             if (newWorkflow == null)
             {
                 action.AddLogEntry( "The Workflow could not be activated", true );
