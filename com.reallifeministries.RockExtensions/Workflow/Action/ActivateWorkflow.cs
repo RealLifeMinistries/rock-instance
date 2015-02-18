@@ -67,12 +67,24 @@ namespace com.reallifeministries.RockExtensions.Workflow.Action
                 currentActivity.LoadAttributes( rockContext );
             }
 
-            // Pass Attributes from current activity to workflow.
+            if (currentWorkflow.Attributes == null)
+            {
+                currentWorkflow.LoadAttributes( rockContext );
+            }
+
+            // Pass attributes from current Workflow to new Workflow.
+            foreach (string key in currentWorkflow.AttributeValues.Keys)
+            {
+                newWorkflow.SetAttributeValue( key, currentWorkflow.GetAttributeValue( key ) );
+            }
+
+            // Pass attributes from current Activity to new Workflow.
             foreach (string key in currentActivity.AttributeValues.Keys)
             {
                 newWorkflow.SetAttributeValue( key, currentActivity.GetAttributeValue(key) );
             }
             
+            // Kick off processing of new Workflow
             if(newWorkflow.Process( rockContext, entity, out errorMessages )) 
             {
                 if (newWorkflow.IsPersisted || newWorkflowType.IsPersisted)
