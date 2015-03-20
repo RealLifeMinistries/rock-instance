@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Collections.Generic;
 using System.Web.UI;
 using System.Linq;
+using System.Data.Entity;
 
 using Rock;
 using Rock.Web.UI.Controls;
@@ -128,7 +129,7 @@ namespace com.reallifeministries.Workflow
                                 if ( action.ActionType.WorkflowForm != null && action.IsCriteriaValid )
                                 {
                                     _activity = activity;
-                                    _activity.LoadAttributes();
+                                    _activity.LoadAttributes(_rockContext);
                                 }
                             }
                         }
@@ -136,7 +137,9 @@ namespace com.reallifeministries.Workflow
 
                     if (_activity != null) 
                     {
+                      
                         var entryPage = _activity.GetAttributeValue("EntryFormPage");
+                        
                         if (!String.IsNullOrEmpty(entryPage))
                         {
                             var queryParams = new Dictionary<string, string>();

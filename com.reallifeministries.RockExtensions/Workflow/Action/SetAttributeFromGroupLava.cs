@@ -15,16 +15,16 @@ using Rock.Workflow;
 
 namespace com.reallifeministries.RockExtensions.Workflow.Action
 {
-   
-    [Description( "Set an attribute on the workflow with a person attribute (Lava)" )]
+    
+    [Description( "Set an attribute on the workflow with a group attribute (Lava)" )]
     [Export( typeof( ActionComponent ) )]
-    [ExportMetadata( "ComponentName", "Set Workflow Attribute With Person Attribute (Lava)" )]
+    [ExportMetadata( "ComponentName", "Set Workflow Attribute With Group Attribute (Lava)" )]
 
-    [WorkflowAttribute( "PersonAttribute", "The workflow attribute containing the person.", true, "", "", 0, null,
-        new string[] { "Rock.Field.Types.PersonFieldType" } )]
+    [WorkflowAttribute( "GroupAttribute", "The workflow attribute containing the group.", true, "", "", 0, null,
+        new string[] { "Rock.Field.Types.GroupFieldType" } )]
     [WorkflowAttribute( "Attribute", "The workflow attribute you will be setting", true)]
-    [TextField("Lava", "Lava to use when setting the attribute.  Normal Workflow merge fields will be available, as well as: {{Person}} which will be the Person model corresponding to the selected Person Attribute",true)]
-    public class SetAttributeFromPersonLava : ActionComponent
+    [TextField("Lava", "Lava to use when setting the attribute.  Normal Workflow merge fields will be available, as well as: {{Group}} which will be the Group model corresponding to the selected Group Attribute",true)]
+    public class SetAttributeFromGroupLava : ActionComponent
     {
          /// <summary>
         /// Executes the specified workflow action.
@@ -38,16 +38,16 @@ namespace com.reallifeministries.RockExtensions.Workflow.Action
         {
             errorMessages = new List<string>();
             
-            var personAttribute =  GetAttributeValue( action, "PersonAttribute" );
-            Guid personAttrGuid = personAttribute.AsGuid();
+            var groupAttribute =  GetAttributeValue( action, "GroupAttribute" );
+            Guid groupAttrGuid = groupAttribute.AsGuid();
             
-            if (!personAttrGuid.IsEmpty())
+            if (!groupAttrGuid.IsEmpty())
             {
-                var personAttributeInst = AttributeCache.Read( personAttrGuid, rockContext );
-                if (personAttributeInst != null)
+                var groupAttributeInst = AttributeCache.Read( groupAttrGuid, rockContext );
+                if (groupAttributeInst != null)
                 {
-                    string attributePersonValue = action.GetWorklowAttributeValue( personAttrGuid );
-                    Guid personAliasGuid = attributePersonValue.AsGuid();
+                    string attributeGroupValue = action.GetWorklowAttributeValue( groupAttrGuid );
+                    Guid groupGuid = attributeGroupValue.AsGuid();
                     
                     var attrAttribute = GetAttributeValue( action, "Attribute" );
                     Guid attributeGuid = attrAttribute.AsGuid();
@@ -58,12 +58,12 @@ namespace com.reallifeministries.RockExtensions.Workflow.Action
                         var attributeInst = AttributeCache.Read( attributeGuid, rockContext );
                         if ( attributeInst != null )
                         {
-                            var personAlias = (new PersonAliasService( rockContext )).Get( personAliasGuid );
-                            if (personAlias != null)
+                            var group = (new GroupService( rockContext )).Get( groupGuid );
+                            if (group != null)
                             {
-                                personAlias.Person.LoadAttributes();
+                                group.LoadAttributes();
                                 var mergeFields = GetMergeFields( action );
-                                mergeFields.Add( "Person", personAlias.Person );
+                                mergeFields.Add( "Group", group );
 
                                 string value = GetAttributeValue( action, "Lava" );
 
@@ -82,7 +82,7 @@ namespace com.reallifeministries.RockExtensions.Workflow.Action
                             }
                             else
                             {
-                                errorMessages.Add( string.Format( "PersonAlias cannot be found: {0}", personAliasGuid ) );
+                                errorMessages.Add( string.Format( "Group cannot be found: {0}", groupGuid ) );
                             }
                         }
                         else
@@ -98,12 +98,12 @@ namespace com.reallifeministries.RockExtensions.Workflow.Action
                 }
                 else
                 {
-                    errorMessages.Add( string.Format( "Person attribute could not be found for '{0}'!", personAttrGuid.ToString() ) );
+                    errorMessages.Add( string.Format( "Group attribute could not be found for '{0}'!", groupAttrGuid.ToString() ) );
                 }
             } 
             else
             {
-                errorMessages.Add( string.Format( "Selected person attribute ('{0}') was not a valid Guid!", personAttribute ) );
+                errorMessages.Add( string.Format( "Selected group attribute ('{0}') was not a valid Guid!", groupAttribute ) );
             }
 
             return true;
