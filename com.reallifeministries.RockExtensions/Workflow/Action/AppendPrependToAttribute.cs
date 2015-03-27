@@ -22,10 +22,10 @@ namespace com.reallifeministries.RockExtensions.Workflow.Action
     [Export( typeof( ActionComponent ) )]
     [ExportMetadata( "ComponentName", "Append/Prepend to Attribute" )]
 
-    [WorkflowAttribute( "Attribute", "The attribute to update the value of." )]
-    [MemoField( "Additional Value", "Value to append or prepend. <span class='tip tip-lava'></span>",true,"","",0,"Value")]
-    [MemoField( "Separator", "Content to place between values")]
-    [BooleanField( "Prepend", "Check if you want to add content before existing value. (Default is after)")]
+    [WorkflowAttribute( "Attribute", "The attribute to update the value of.",true,"","",0 )]
+    [BooleanField( "Prepend", "Check if you want to add content before existing value. (Default is after)",false,"",1 )]
+    [CodeEditorField( "Value", "Formatted content to append or prepend. <span class='tip tip-lava'></span>", Rock.Web.UI.Controls.CodeEditorMode.Html, Rock.Web.UI.Controls.CodeEditorTheme.Rock, 200, false, "", "", 2 )]
+    [CodeEditorField("Separator", "Content to place between values",Rock.Web.UI.Controls.CodeEditorMode.Html,Rock.Web.UI.Controls.CodeEditorTheme.Rock,200,false,"","",3)]
     public class AppendPrependAttributeValue : ActionComponent
     {
         /// <summary>
@@ -57,8 +57,10 @@ namespace com.reallifeministries.RockExtensions.Workflow.Action
                     {
                         separator = GetAttributeValue( action, "Separator" );
                     }
+
+                    var mergeFields = GetMergeFields( action );
                     
-                    value = value.ResolveMergeFields( GetMergeFields( action ) );
+                    value = value.ResolveMergeFields( mergeFields );
                     
                     string valueAction;
                     string newValue;
