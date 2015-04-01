@@ -17,12 +17,12 @@ using Rock.Workflow;
 namespace com.reallifeministries.Workflow
 {
 
-    [DisplayName( "Ensure Activity Entry Page" )]
+    [DisplayName( "Ensure Entry Page" )]
     [Category( "WorkFlow" )]
-    [Description( "Used with entry page workflow action. Watches the specified entry page for the activity, and redirects to the specified page if this page doesn't match." )]
+    [Description( "Used with entry page workflow action. Watches the specified entry page for the workflow, and redirects to the specified page if this page doesn't match." )]
 
     [TextField("Workflow Attributes To Page Parameters", "The attributes of the workflow to watch, and set as parameters to the page. (comma separated)",false,"","",0,"WorkflowAttributes")]
-    public partial class EnsureActivityEntryPage : Rock.Web.UI.RockBlock
+    public partial class EnsureEntryPage : Rock.Web.UI.RockBlock
     {
 
         #region Fields
@@ -31,6 +31,7 @@ namespace com.reallifeministries.Workflow
          private WorkflowService _workflowService = null;
          private Rock.Model.Workflow _workflow = null;
          private WorkflowActivity _activity = null;
+         private int? _workflowId;
 
         #endregion
 
@@ -43,8 +44,8 @@ namespace com.reallifeministries.Workflow
         /// </value>
         public int? WorkflowId
         {
-            get { return ViewState["WorkflowId"] as int?; }
-            set { ViewState["WorkflowId"] = value; }
+            get { return _workflowId; }
+            set { _workflowId = value; }
         }
 
         #endregion
@@ -62,28 +63,24 @@ namespace com.reallifeministries.Workflow
             {
                 _workflowService = new WorkflowService( _rockContext );
             }
-
-            // If operating against an existing workflow, get the workflow and load attributes
+            var paramWorkflowId = PageParameter( "WorkflowId" );
+            WorkflowId = paramWorkflowId.AsIntegerOrNull();
             if ( !WorkflowId.HasValue )
             {
-                WorkflowId = PageParameter( "WorkflowId" ).AsIntegerOrNull();
-                if ( !WorkflowId.HasValue )
+                Guid guid = PageParameter( "WorkflowGuid" ).AsGuid();
+                if ( !guid.IsEmpty() )
                 {
-                    Guid guid = PageParameter( "WorkflowGuid" ).AsGuid();
-                    if ( !guid.IsEmpty() )
+                    _workflow = _workflowService.Queryable()
+                        .Where( w => w.Guid.Equals( guid ) )
+                        .FirstOrDefault();
+                    if ( _workflow != null )
                     {
-                        _workflow = _workflowService.Queryable()
-                            .Where( w => w.Guid.Equals( guid ) )
-                            .FirstOrDefault();
-                        if ( _workflow != null )
-                        {
-                            WorkflowId = _workflow.Id;
-                        }
+                        WorkflowId = _workflow.Id;
                     }
                 }
             }
 
-             if ( WorkflowId.HasValue )
+            if ( WorkflowId.HasValue )
             {
                 if ( _workflow == null )
                 {
@@ -100,14 +97,8 @@ namespace com.reallifeministries.Workflow
 
             }
 
-            if ( _workflow == null )
+            if ( _workflow != null )
             {
-                if (Page.IsPostBack)
-                {
-                    ShowMessage( NotificationBoxType.Danger, "Workflow Error", "Workflow could not be loaded. Please ensure you have specified a redirect in the entry page action." );
-                }
-            } else {
-
                 if ( _workflow.IsActive )
                 {
                     int personId = CurrentPerson != null ? CurrentPerson.Id : 0;
@@ -138,7 +129,7 @@ namespace com.reallifeministries.Workflow
                     if (_activity != null) 
                     {
                       
-                        var entryPage = _activity.GetAttributeValue("EntryFormPage");
+                        var entryPage = _workflow.GetAttributeValue("EntryFormPage");
                         
                         if (!String.IsNullOrEmpty(entryPage))
                         {

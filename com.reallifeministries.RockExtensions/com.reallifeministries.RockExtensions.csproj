@@ -56,7 +56,7 @@
     <Compile Include="Workflow\Action\ActivateWorkflow.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Workflow\Action\AppendPrependToAttribute.cs" />
-    <Compile Include="Workflow\Action\SetActivityEntryPage.cs" />
+    <Compile Include="Workflow\Action\SetWorkflowEntryPage.cs" />
     <Compile Include="Workflow\Action\SetAttributeFromGroupLava.cs" />
     <Compile Include="Workflow\Action\SetAttributeFromPersonLava.cs" />
   </ItemGroup>
