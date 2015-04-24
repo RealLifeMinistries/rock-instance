@@ -6,9 +6,9 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("com.reallifeministries.RockExtensions")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription( "Custom extensions to RockRMS" )]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany( "Real Life Ministries" )]
 [assembly: AssemblyProduct("com.reallifeministries.RockExtensions")]
 [assembly: AssemblyCopyright("Copyright ©  2015")]
 [assembly: AssemblyTrademark("")]
