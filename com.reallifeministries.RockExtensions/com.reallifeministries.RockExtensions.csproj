@@ -47,7 +47,7 @@
     </Reference>
     <Reference Include="Rock">
       <HintPath>..\RockWeb\Bin\Rock.dll</HintPath>
-      <Private>False</Private>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Rock.Migrations">
       <HintPath>..\RockWeb\Bin\Rock.Migrations.dll</HintPath>
@@ -67,10 +67,7 @@
     <Compile Include="Attribute\FilteredGroupFinderFieldAttribute.cs" />
     <Compile Include="Data\Context.cs" />
     <Compile Include="Field\Types\FilteredGroupFinderFieldType.cs" />
-    <Compile Include="Migrations\201504242050051_CreateFilteredGroupFinderFieldType.cs" />
-    <Compile Include="Migrations\201504242050051_CreateFilteredGroupFinderFieldType.Designer.cs">
-      <DependentUpon>201504242050051_CreateFilteredGroupFinderFieldType.cs</DependentUpon>
-    </Compile>
+    <Compile Include="Migrations\001_AddFilteredGroupFinderFieldType.cs" />
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -96,11 +93,6 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Migrations\201504242050051_CreateFilteredGroupFinderFieldType.resx">
-      <DependentUpon>201504242050051_CreateFilteredGroupFinderFieldType.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
