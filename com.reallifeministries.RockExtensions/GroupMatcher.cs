@@ -8,7 +8,7 @@ using Rock.Data;
 
 namespace com.reallifeministries.RockExtensions
 {
-    class GroupMatcher
+    public class GroupMatcher
     {
         private double metersInMile = 1609.344;
 
@@ -23,27 +23,32 @@ namespace com.reallifeministries.RockExtensions
         public Location personLocation;
         public GroupType groupType;
 
-        public void GroupMatcher(Person pers, GroupType gt, List<int> days)
+        public GroupMatcher(Person pers, GroupType gt, List<int> days)
         {
             person = pers;
             personLocation = pers.GetHomeLocation();
             daysOfWeek = days;
             groupType = gt;
         }
-
-        public List<Group> GetMatches()
+        
+        public List<GroupMatch> GetMatches()
         {
-            var matches = new List<Group>();
+            var matches = new List<GroupMatch>();
             using (var ctx = new RockContext()) 
             {
-                matches = (
-                    from g in ctx.Groups
+               matches = (
                     from gl in ctx.GroupLocations
                     let distance = gl.Location.GeoPoint.Distance(personLocation.GeoPoint)
+                    let memberCount = gl.Group.Members.Select(m => m.PersonId).Distinct().Count()
                     where distance <= (metersInMile * acceptableMileRadius)
-                    where g.GroupTypeId == groupType.Id
-                    select g
-                    ).Take(numMatches).ToList();
+                    where gl.Group.GroupTypeId == groupType.Id
+                    select new GroupMatch {
+                        Group = gl.Group,
+                        Distance = distance / metersInMile,
+                        MemberCount = memberCount
+                    }
+                   ).Take(numMatches).ToList();
+
             }
             
             return matches;

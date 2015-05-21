@@ -52,6 +52,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GroupMatch.cs" />
+    <Compile Include="GroupMatcher.cs" />
     <Compile Include="Workflow\Action\AddPersonToGroup.cs" />
     <Compile Include="Workflow\Action\AssignToGroupRole.cs" />
     <Compile Include="Workflow\Action\ActivateWorkflow.cs" />
