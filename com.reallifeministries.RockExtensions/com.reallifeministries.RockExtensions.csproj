@@ -32,7 +32,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="DotLiquid">
-      <HintPath>..\packages\DotLiquid.1.8.0\lib\NET45\DotLiquid.dll</HintPath>
+      <HintPath>..\RockWeb\Bin\DotLiquid.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework">
       <HintPath>..\RockWeb\Bin\EntityFramework.dll</HintPath>
@@ -60,10 +60,6 @@
     <Compile Include="Workflow\Action\SetWorkflowEntryPage.cs" />
     <Compile Include="Workflow\Action\SetAttributeFromGroupLava.cs" />
     <Compile Include="Workflow\Action\SetAttributeFromPersonLava.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />

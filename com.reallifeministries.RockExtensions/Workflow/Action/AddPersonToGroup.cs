@@ -24,7 +24,7 @@ namespace com.reallifeministries.RockExtensions.Workflow.Action
     [WorkflowAttribute( "Group Attribute", "The workflow attribute containing the group.", true, "", "", 1, null,
         new string[] { "Rock.Field.Types.GroupFieldType" } )]
     [GroupRoleField( "", "Group Role", "", true, "", "", 2, "Group Role" )]
-    [EnumField("Member Status","",typeof(GroupMemberStatus),true,"","",3,"MemberStatus")]
+    [EnumField( "Member Status", "", typeof( GroupMemberStatus ), true, "", "", 3, "MemberStatus" )]
     public class AddPersonToGroup : ActionComponent
     {
         /// <summary>
@@ -40,29 +40,29 @@ namespace com.reallifeministries.RockExtensions.Workflow.Action
             errorMessages = new List<string>();
             var groupAttribute = GetAttributeValue( action, "GroupAttribute" );
             Guid groupAttrGuid = groupAttribute.AsGuid();
-            
+
             var personAttribute = GetAttributeValue( action, "PersonAttribute" );
             Guid personAttrGuid = personAttribute.AsGuid();
-            
+
             var groupRoleAttr = GetAttributeValue( action, "Group Role" );
             Guid groupRoleGuid = groupRoleAttr.AsGuid();
-            var memberStatus = (GroupMemberStatus)Enum.Parse(typeof(GroupMemberStatus), GetAttributeValue( action, "MemberStatus"));
-                   
+            var memberStatus = (GroupMemberStatus)Enum.Parse( typeof( GroupMemberStatus ), GetAttributeValue( action, "MemberStatus" ) );
+
             if (!groupAttrGuid.IsEmpty())
             {
                 string attributeGroupValue = action.GetWorklowAttributeValue( groupAttrGuid );
                 Guid groupGuid = attributeGroupValue.AsGuid();
 
-                if(!personAttrGuid.IsEmpty())
+                if (!personAttrGuid.IsEmpty())
                 {
                     string attributePersonValue = action.GetWorklowAttributeValue( personAttrGuid );
                     Guid personAliasGuid = attributePersonValue.AsGuid();
 
-                    if(!groupRoleGuid.IsEmpty())
+                    if (!groupRoleGuid.IsEmpty())
                     {
                         if (!groupGuid.IsEmpty())
                         {
-                            if(!personAliasGuid.IsEmpty())
+                            if (!personAliasGuid.IsEmpty())
                             {
                                 using (var ctx = new RockContext())
                                 {
@@ -70,7 +70,7 @@ namespace com.reallifeministries.RockExtensions.Workflow.Action
                                     var personAlias = (new PersonAliasService( ctx )).Get( personAliasGuid );
                                     var groupRole = (new GroupTypeRoleService( ctx )).Get( groupRoleGuid );
 
-                                
+
                                     if (groupRole != null)
                                     {
 
@@ -100,12 +100,12 @@ namespace com.reallifeministries.RockExtensions.Workflow.Action
                                     {
                                         action.AddLogEntry( string.Format( "GroupRole does not exist: {0}", groupRoleGuid ) );
                                     }
-                                    
+
                                 }
                             }
                             else
                             {
-                                action.AddLogEntry("Person attribute, person does not exist");
+                                action.AddLogEntry( "Person attribute, person does not exist" );
                             }
                         }
                         else
