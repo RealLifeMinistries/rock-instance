@@ -1,14 +1,11 @@
-+ Improve performance of check-in's Find Families action.
-+ Added a setting to the check-in Find Families action to limit the number of families returned by search (default is 100).
-+ Added a phone number index to improve check-in performance.
-+ Fixed filtering issue when filtering on defined value attributes that allow multiple values (Fixes #910).
-+ Updated the Transaction Entry block so that the 'Next' button does not remain disabled after a validation error (Fixes #899).
-+ Fixed issue with not being able to send communications that included an attachment.
-+ Fixed issue with displaying known and implied relationships on the person detail page (Fixes #930).
-+ Fixed spacing of the 'In Group of Type' badge (Fixes #908).
-+ Fixed issue with existing people creating a new login and not being able to login (Fixes #928).
-+ Improved how Rock manages shared connections to database.
-+ Fixed issue with tag report.
-+ Added additional indexes to improve performance of person merge.
-+ Fixed issue with not being able to update a binary file person attribute (Fixes #874).
-+ Fixed issue with SMS replies being sent to the wrong person.
++ Fixed exception in Batch Detail when batch contained transactions without a currency value (Fixes #998)
++ Fixed issue with person history causing an exception after manual attendance was entered (Fixes #999).
++ Fixed exception on Page List when attempting to sort by Layout column (Fixes #1004)
++ Fixed issue with address auto-compute not working correctly on the person search (Fixes #994)
++ Fixed issue with 'First Contribution Date' report filter taking a very long time to load (Fixes #972).
++ Updated the link in group attendance email to include the impersonated person link so that group leader does not need to login when entering attendance (Fixes #1000).
++ Updated Template Detail block to use 'SMS' instead of 'Sms' (Fixes #891).
++ Updated Person Following List to show proper home/mobile phone in heading based on value of the home/mobile defined type (Fixes #1003).
++ Updated Person Following list so that phone and spouse columns are not sortable (Fixes #1001).
++ Updated check-in to print labels in configured order (Fixes #1007).
++ Updated the person merge so that it does not set external logins to be unconfirmed (Fixes #1005).
