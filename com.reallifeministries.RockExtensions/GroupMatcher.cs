@@ -34,10 +34,13 @@ namespace com.reallifeministries.RockExtensions
                matches = (
                     from gl in ctx.GroupLocations
                     let distance = gl.Location.GeoPoint.Distance(personLocation.GeoPoint)
-                    let memberCount = gl.Group.Members.Select(m => m.PersonId).Distinct().Count()
+                    let memberCount = gl.Group.Members.Where(m => 
+                        m.GroupMemberStatus == GroupMemberStatus.Active
+                        ).Select(m => m.PersonId).Distinct().Count()
                     where gl.Group.Schedule.WeeklyDayOfWeek != null
                     where  daysOfWeek.Contains( (DayOfWeek)gl.Group.Schedule.WeeklyDayOfWeek )
                     where gl.Group.GroupTypeId == groupType.Id
+                    where gl.Location.GeoPoint != null
                     orderby distance
                     select new GroupMatch {
                         Group = gl.Group,
