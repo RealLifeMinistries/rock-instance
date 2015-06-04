@@ -11,19 +11,14 @@ namespace com.reallifeministries.RockExtensions
     public class GroupMatcher
     {
         private double metersInMile = 1609.344;
-
-        public int acceptableMileRadius = 5;
-        public int sizeWeight = 10;
-        public int locationWeight = 10;
-        public int dayOfWeekWeight = 10;
         public int numMatches = 3;
 
-        public List<int> daysOfWeek;
+        public List<DayOfWeek> daysOfWeek;
         public Person person;
         public Location personLocation;
         public GroupType groupType;
 
-        public GroupMatcher(Person pers, GroupType gt, List<int> days)
+        public GroupMatcher(Person pers, GroupType gt, List<DayOfWeek> days)
         {
             person = pers;
             personLocation = pers.GetHomeLocation();
@@ -40,17 +35,19 @@ namespace com.reallifeministries.RockExtensions
                     from gl in ctx.GroupLocations
                     let distance = gl.Location.GeoPoint.Distance(personLocation.GeoPoint)
                     let memberCount = gl.Group.Members.Select(m => m.PersonId).Distinct().Count()
-                    where distance <= (metersInMile * acceptableMileRadius)
+                    where gl.Group.Schedule.WeeklyDayOfWeek != null
+                    where  daysOfWeek.Contains( (DayOfWeek)gl.Group.Schedule.WeeklyDayOfWeek )
                     where gl.Group.GroupTypeId == groupType.Id
+                    orderby distance
                     select new GroupMatch {
                         Group = gl.Group,
                         Distance = distance / metersInMile,
-                        MemberCount = memberCount
+                        MemberCount = memberCount,
+                        Location = gl.Location,
+                        Schedule = gl.Group.Schedule
                     }
                    ).Take(numMatches).ToList();
-
-            }
-            
+            }   
             return matches;
         }
     }

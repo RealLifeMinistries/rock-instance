@@ -8,7 +8,6 @@
                 <legend>Configuration</legend>
                 <Rock:RockDropDownList runat="server" ID="pkrGroupType" Label="Group Type" DataTextField="Name" DataValueField="Id" Required="true" />
                 <Rock:DaysOfWeekPicker runat="server" ID="pkrDaysOfWeek" Label="Days Of Week" Required="true" />
-                <Rock:NumberBox runat="server" ID="tbAcceptableRadius" Label="Acceptable Mile Radius" />
             </fieldset>                      
             <fieldset>
                 <legend>Person</legend>           
@@ -22,6 +21,9 @@
                     <asp:BoundField DataField="Group.Name" HeaderText="Name" />
                     <asp:BoundField DataField="Group.ID" HeaderText="ID" />
                     <asp:BoundField DataField="Distance" HeaderText="Distance" />
+                    <asp:BoundField DataField="MemberCount" HeaderText="# Members" />
+                    <asp:BoundField DataField="Schedule.WeeklyDayOfWeek" HeaderText="Meeting Day" />
+                    <asp:BoundField DataField="Schedule.WeeklyTimeOfDay" HeaderText="Meeting Time" />
                 </Columns>
             </Rock:Grid>
         </asp:Panel>

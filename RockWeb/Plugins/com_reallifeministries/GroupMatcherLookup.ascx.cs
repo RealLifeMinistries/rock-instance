@@ -34,7 +34,7 @@ namespace com.reallifeministries
             pkrGroupType.DataSource = (from gt in _ctx.GroupTypes select gt).ToList();
             pkrGroupType.DataBind();
 
-            tbAcceptableRadius.Text = "10";
+            
         }
 
         protected void btnSubmit_Click( object sender, EventArgs e )
@@ -42,11 +42,8 @@ namespace com.reallifeministries
             if (Page.IsValid)
             {
 
-
                 var person_id = pkrPerson.PersonId;
                 var group_type_id = Int32.Parse( pkrGroupType.SelectedValue );
-                var daysOfWeek = new List<int>();
-                var mileRadius = Int32.Parse( tbAcceptableRadius.Text );
 
                 if (person_id != null && group_type_id > 0)
                 {
@@ -57,12 +54,7 @@ namespace com.reallifeministries
                     var groupTypeService = new Rock.Model.GroupTypeService( _ctx );
                     Rock.Model.GroupType groupType = groupTypeService.Get( group_type_id );
 
-                    GroupMatcher groupMatcher = new GroupMatcher( person, groupType, daysOfWeek );
-
-                    if (mileRadius > 0)
-                    {
-                        groupMatcher.acceptableMileRadius = mileRadius;
-                    }
+                    GroupMatcher groupMatcher = new GroupMatcher( person, groupType, pkrDaysOfWeek.SelectedDaysOfWeek );
 
                     var matches = groupMatcher.GetMatches();
 
