@@ -65,18 +65,9 @@
 </asp:UpdatePanel>
 <script>
     jQuery(function ($) {
-        var $dpAttendanceDate = $(<%= dpAttendanceDate.ClientID %>);
-        var attendanceDateKey = 'attendance-attendedDate';
-
+        
         var $sbCampusPicker = $(<%= ddlCampus.ClientID %>);
         var campusKey = 'attendance-campus_id';
-
-        if (!$dpAttendanceDate.val()) {
-            $dpAttendanceDate.val(sessionStorage.getItem(attendanceDateKey));
-        }
-        $dpAttendanceDate.on('change', function (e) {
-            sessionStorage.setItem(attendanceDateKey, $dpAttendanceDate.val());
-        });
 
         if (!$sbCampusPicker.val()) {
             $sbCampusPicker.val(sessionStorage.getItem(campusKey));

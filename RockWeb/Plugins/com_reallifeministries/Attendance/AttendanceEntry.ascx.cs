@@ -22,10 +22,8 @@ namespace com.reallifeministries.Attendance
     /// </summary>
     [Category( "Attendance" )]
     [Description( "All Church Attendance" )]
-    //[LinkedPage( "Admin Page" )]
-    //[BooleanField( "Show Key Pad", "Show the number key pad on the search screen", false )]
-    //[IntegerField( "Minimum Text Length", "Minimum length for text searches (defaults to 4).", false, 4 )]
-    //[IntegerField( "Maximum Text Length", "Maximum length for text searches (defaults to 20).", false, 20 )]
+    [GroupField("Attending Group","Usually the attendance area/Checkin group",true)]
+    [IntegerField("Schedule Id","The schedule connected with this Attendance",true)]
     public partial class AttendanceEntry : RockBlock
     {
         protected RockContext ctx;
@@ -39,11 +37,35 @@ namespace com.reallifeministries.Attendance
                 pnlResults.Visible = false;
                 BindCampusPicker();
 
-                // @TODO: set campus to default campus for person
+                var lastAttendedDate = Session["attendance-attended-date"];
+                if(lastAttendedDate != null) {
+                    dpAttendanceDate.SelectedDate = (DateTime)lastAttendedDate;
+                } else {
+                    dpAttendanceDate.SelectedDate = GetLastSunday();
+                }
+                
+                
             }
         }
 
-       
+        private DateTime GetLastSunday()
+        {
+
+            DateTime oDate = DateTime.Now;
+
+            DayOfWeek dow = DateTime.Now.DayOfWeek;
+
+            if ((int)dow < 5)
+            {
+
+                return DateTime.Now.AddDays( 7 - (int)dow - 7 );
+            }
+            else
+            {
+                return DateTime.Now.AddDays( 7 - (int)dow );
+            }
+
+        }
         protected void BindCampusPicker()
         {
             ddlCampus.Campuses = CampusCache.All();
@@ -53,6 +75,8 @@ namespace com.reallifeministries.Attendance
         protected void btnSearch_Click( object sender, EventArgs e )
         {
             lblMessage.Text = null;
+
+            Session["attendance-attended-date"] = dpAttendanceDate.SelectedDate;
 
             var personService = new PersonService( ctx );
             pnlResults.Visible = true;
@@ -125,20 +149,23 @@ namespace com.reallifeministries.Attendance
                 }
             }
 
-            /*if (!String.IsNullOrEmpty(campusPicker.SelectedValue))
-            {
-                recorder.CampusId = Convert.ToInt32(campusPicker.SelectedValue);
-            }*/
 
+            var groupGuid = GetAttributeValue( "AttendingGroup" ).AsGuid();
             var personService = new PersonService( ctx );
             var attendanceService = new AttendanceService( ctx );
+            var groupService = new GroupService( ctx );
+
             var people = personService.GetByIds( peopleIds );
+            var scheduleId = GetAttributeValue( "ScheduleId" ).AsIntegerOrNull();
 
             foreach (Person person in people)
             {
                 Rock.Model.Attendance attendance = ctx.Attendances.Create();
                 attendance.PersonAlias = person.PrimaryAlias;
                 attendance.StartDateTime = (DateTime)dpAttendanceDate.SelectedDate;
+                attendance.Group = groupService.Get( groupGuid );
+                attendance.ScheduleId = scheduleId;               
+
                 var campus_id = ddlCampus.SelectedValue;
                 if (!String.IsNullOrEmpty( campus_id ))
                 {
