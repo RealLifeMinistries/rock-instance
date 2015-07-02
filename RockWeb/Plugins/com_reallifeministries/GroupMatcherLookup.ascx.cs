@@ -9,7 +9,7 @@ using System.Web.UI.WebControls;
 using Rock.Web;
 using Rock.Data;
 using Rock.Attribute;
-using com.reallifeministries.RockExtensions;
+using com.reallifeministries.GroupMatching;
 
 namespace com.reallifeministries 
 {

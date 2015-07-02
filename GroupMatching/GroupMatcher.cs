@@ -3,35 +3,67 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Rock;
 using Rock.Model;
+using Rock.Data;
 using System.Runtime.Serialization;
 using System.Reflection;
 
-using Rock.Data;
-
-
-
-namespace com.reallifeministries.RockExtensions
+namespace com.reallifeministries.GroupMatching
 {
     [DataContract]
-    public class GroupMatch : Rock.Lava.ILiquidizable
+    public class GroupMatcher : Rock.Lava.ILiquidizable
     {
-        [DataMember]
-        public Group Group { get; set; }
+        private double metersInMile = 1609.344;
+        public int numMatches = 3;
 
         [DataMember]
-        public Location Location { get; set; }
-
+        public List<DayOfWeek> daysOfWeek;
         [DataMember]
-        public double? Distance { get; set; }
-
+        public Person person;
         [DataMember]
-        public int MemberCount { get; set; }
-
+        public Location personLocation;
         [DataMember]
-        public Schedule Schedule { get; set; }
+        public GroupType groupType;
 
-       
+        [LavaIgnore]
+        public GroupMatcher(Person pers, GroupType gt, List<DayOfWeek> days)
+        {
+            person = pers;
+            personLocation = pers.GetHomeLocation();
+            daysOfWeek = days;
+            groupType = gt;
+        }
+        
+        [LavaIgnore]
+        public List<GroupMatch> GetMatches()
+        {
+            var matches = new List<GroupMatch>();
+            using (var ctx = new RockContext()) 
+            {
+               matches = (
+                    from gl in ctx.GroupLocations
+                    let distance = gl.Location.GeoPoint.Distance(personLocation.GeoPoint)
+                    let memberCount = gl.Group.Members.Where(m => 
+                        m.GroupMemberStatus == GroupMemberStatus.Active
+                        ).Select(m => m.PersonId).Distinct().Count()
+                    where gl.Group.Schedule.WeeklyDayOfWeek != null
+                    where  daysOfWeek.Contains( (DayOfWeek)gl.Group.Schedule.WeeklyDayOfWeek )
+                    where gl.Group.GroupTypeId == groupType.Id
+                    where gl.Location.GeoPoint != null
+                    where gl.Group.IsActive
+                    orderby distance
+                    select new GroupMatch {
+                        Group = gl.Group,
+                        Distance = distance / metersInMile,
+                        MemberCount = memberCount,
+                        Location = gl.Location,
+                        Schedule = gl.Group.Schedule
+                    }
+                   ).Take(numMatches).ToList();
+            }   
+            return matches;
+        }
 
         #region iLiquidizable
 
@@ -106,7 +138,6 @@ namespace com.reallifeministries.RockExtensions
         /// </summary>
         /// <param name="key">The key.</param>
         /// <returns></returns>
-        [LavaIgnore]
         public bool ContainsKey( object key )
         {
             var propInfo = GetType().GetProperty( key.ToString() );
@@ -117,7 +148,7 @@ namespace com.reallifeministries.RockExtensions
 
             return false;
         }
-        [LavaIgnore]
+
         private bool LiquidizableProperty( PropertyInfo propInfo )
         {
             // If property has a [LavaIgnore] attribute return false

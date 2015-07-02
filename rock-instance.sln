@@ -7,7 +7,7 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "RockWeb", "http://localhost
 	ProjectSection(WebsiteProperties) = preProject
 		UseIISExpress = "true"
 		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.5.1"
-		ProjectReferences = "{459856d3-83ba-476c-8284-ab1d11f7bb00}|com.reallifeministries.RockExtensions.dll;"
+		ProjectReferences = "{459856d3-83ba-476c-8284-ab1d11f7bb00}|com.reallifeministries.RockExtensions.dll;{f18806fe-83bd-45e3-a230-323211daaa72}|com.reallifeministries.GroupMatching.dll;"
 		Debug.AspNetCompiler.VirtualPath = "/localhost_50345"
 		Debug.AspNetCompiler.PhysicalPath = "RockWeb\"
 		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_50345\"
@@ -26,9 +26,12 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "RockWeb", "http://localhost
 	EndProjectSection
 	ProjectSection(ProjectDependencies) = postProject
 		{459856D3-83BA-476C-8284-AB1D11F7BB00} = {459856D3-83BA-476C-8284-AB1D11F7BB00}
+		{F18806FE-83BD-45E3-A230-323211DAAA72} = {F18806FE-83BD-45E3-A230-323211DAAA72}
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "com.reallifeministries.RockExtensions", "com.reallifeministries.RockExtensions\com.reallifeministries.RockExtensions.csproj", "{459856D3-83BA-476C-8284-AB1D11F7BB00}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "com.reallifeministries.GroupMatching", "GroupMatching\com.reallifeministries.GroupMatching.csproj", "{F18806FE-83BD-45E3-A230-323211DAAA72}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,6 +47,10 @@ Global
 		{459856D3-83BA-476C-8284-AB1D11F7BB00}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{459856D3-83BA-476C-8284-AB1D11F7BB00}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{459856D3-83BA-476C-8284-AB1D11F7BB00}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F18806FE-83BD-45E3-A230-323211DAAA72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F18806FE-83BD-45E3-A230-323211DAAA72}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F18806FE-83BD-45E3-A230-323211DAAA72}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F18806FE-83BD-45E3-A230-323211DAAA72}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

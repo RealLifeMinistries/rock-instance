@@ -42,27 +42,6 @@
             <param name="message">The message.</param>
             <param name="inner">The inner.</param>
         </member>
-        <member name="M:YamlDotNet.Core.YamlException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
-            <summary>
-            Initializes a new instance of the <see cref="T:YamlDotNet.Core.YamlException"/> class.
-            </summary>
-            <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo"/> that holds the serialized object data about the exception being thrown.</param>
-            <param name="context">The <see cref="T:System.Runtime.Serialization.StreamingContext"/> that contains contextual information about the source or destination.</param>
-            <exception cref="T:System.ArgumentNullException">The <paramref name="info"/> parameter is null. </exception>
-            <exception cref="T:System.Runtime.Serialization.SerializationException">The class name is null or <see cref="P:System.Exception.HResult"/> is zero (0). </exception>
-        </member>
-        <member name="M:YamlDotNet.Core.YamlException.GetObjectData(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
-            <summary>
-            When overridden in a derived class, sets the <see cref="T:System.Runtime.Serialization.SerializationInfo"/> with information about the exception.
-            </summary>
-            <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo"/> that holds the serialized object data about the exception being thrown.</param>
-            <param name="context">The <see cref="T:System.Runtime.Serialization.StreamingContext"/> that contains contextual information about the source or destination.</param>
-            <exception cref="T:System.ArgumentNullException">The <paramref name="info"/> parameter is a null reference (Nothing in Visual Basic). </exception>
-            <PermissionSet>
-            	<IPermission class="System.Security.Permissions.FileIOPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Read="*AllFiles*" PathDiscovery="*AllFiles*"/>
-            	<IPermission class="System.Security.Permissions.SecurityPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Flags="SerializationFormatter"/>
-            </PermissionSet>
-        </member>
         <member name="P:YamlDotNet.Core.YamlException.Start">
             <summary>
             Gets the position in the input stream where the event that originated the exception starts.
@@ -96,15 +75,6 @@
             <param name="message">The message.</param>
             <param name="inner">The inner.</param>
         </member>
-        <member name="M:YamlDotNet.Core.AnchorNotFoundException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
-            <summary>
-            Initializes a new instance of the <see cref="T:YamlDotNet.Core.AnchorNotFoundException"/> class.
-            </summary>
-            <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo"/> that holds the serialized object data about the exception being thrown.</param>
-            <param name="context">The <see cref="T:System.Runtime.Serialization.StreamingContext"/> that contains contextual information about the source or destination.</param>
-            <exception cref="T:System.ArgumentNullException">The <paramref name="info"/> parameter is null. </exception>
-            <exception cref="T:System.Runtime.Serialization.SerializationException">The class name is null or <see cref="P:System.Exception.HResult"/> is zero (0). </exception>
-        </member>
         <member name="T:YamlDotNet.Core.Constants">
             <summary>
             Defines constants thar relate to the YAML specification.
@@ -137,15 +107,6 @@
             </summary>
             <param name="message">The message.</param>
             <param name="inner">The inner.</param>
-        </member>
-        <member name="M:YamlDotNet.Core.DuplicateAnchorException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
-            <summary>
-            Initializes a new instance of the <see cref="T:YamlDotNet.Core.DuplicateAnchorException"/> class.
-            </summary>
-            <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo"/> that holds the serialized object data about the exception being thrown.</param>
-            <param name="context">The <see cref="T:System.Runtime.Serialization.StreamingContext"/> that contains contextual information about the source or destination.</param>
-            <exception cref="T:System.ArgumentNullException">The <paramref name="info"/> parameter is null. </exception>
-            <exception cref="T:System.Runtime.Serialization.SerializationException">The class name is null or <see cref="P:System.Exception.HResult"/> is zero (0). </exception>
         </member>
         <member name="T:YamlDotNet.Core.Emitter">
             <summary>
@@ -1107,15 +1068,6 @@
             <param name="message">The message.</param>
             <param name="inner">The inner.</param>
         </member>
-        <member name="M:YamlDotNet.Core.ForwardAnchorNotSupportedException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
-            <summary>
-            Initializes a new instance of the <see cref="T:YamlDotNet.Core.AnchorNotFoundException"/> class.
-            </summary>
-            <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo"/> that holds the serialized object data about the exception being thrown.</param>
-            <param name="context">The <see cref="T:System.Runtime.Serialization.StreamingContext"/> that contains contextual information about the source or destination.</param>
-            <exception cref="T:System.ArgumentNullException">The <paramref name="info"/> parameter is null. </exception>
-            <exception cref="T:System.Runtime.Serialization.SerializationException">The class name is null or <see cref="P:System.Exception.HResult"/> is zero (0). </exception>
-        </member>
         <member name="T:YamlDotNet.Core.HashCode">
             <summary>
             Supports implementations of <see cref="M:System.Object.GetHashCode"/> by providing methods to combine two hash codes.
@@ -1824,15 +1776,6 @@
             <param name="message">The message.</param>
             <param name="inner">The inner.</param>
         </member>
-        <member name="M:YamlDotNet.Core.SemanticErrorException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
-            <summary>
-            Initializes a new instance of the <see cref="T:YamlDotNet.Core.SemanticErrorException"/> class.
-            </summary>
-            <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo"/> that holds the serialized object data about the exception being thrown.</param>
-            <param name="context">The <see cref="T:System.Runtime.Serialization.StreamingContext"/> that contains contextual information about the source or destination.</param>
-            <exception cref="T:System.ArgumentNullException">The <paramref name="info"/> parameter is null. </exception>
-            <exception cref="T:System.Runtime.Serialization.SerializationException">The class name is null or <see cref="P:System.Exception.HResult"/> is zero (0). </exception>
-        </member>
         <member name="T:YamlDotNet.Core.SyntaxErrorException">
             <summary>
             Exception that is thrown when a syntax error is detected on a YAML stream.
@@ -1860,15 +1803,6 @@
             </summary>
             <param name="message">The message.</param>
             <param name="inner">The inner.</param>
-        </member>
-        <member name="M:YamlDotNet.Core.SyntaxErrorException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
-            <summary>
-            Initializes a new instance of the <see cref="T:YamlDotNet.Core.SyntaxErrorException"/> class.
-            </summary>
-            <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo"/> that holds the serialized object data about the exception being thrown.</param>
-            <param name="context">The <see cref="T:System.Runtime.Serialization.StreamingContext"/> that contains contextual information about the source or destination.</param>
-            <exception cref="T:System.ArgumentNullException">The <paramref name="info"/> parameter is null. </exception>
-            <exception cref="T:System.Runtime.Serialization.SerializationException">The class name is null or <see cref="P:System.Exception.HResult"/> is zero (0). </exception>
         </member>
         <member name="T:YamlDotNet.Core.TagDirectiveCollection">
             <summary>
@@ -3759,13 +3693,6 @@
             <summary>
             Performs type conversions using every standard provided by the .NET library.
             </summary>
-        </member>
-        <member name="M:YamlDotNet.Serialization.Utilities.TypeConverter.RegisterTypeConverter``2">
-            <summary>
-            Registers a <see cref="T:System.ComponentModel.TypeConverter"/> dynamically.
-            </summary>
-            <typeparam name="TConvertible">The type to which the coverter should be associated.</typeparam>
-            <typeparam name="TConverter">The type of the converter.</typeparam>
         </member>
         <member name="M:YamlDotNet.Serialization.Utilities.TypeConverter.ChangeType``1(System.Object)">
             <summary>

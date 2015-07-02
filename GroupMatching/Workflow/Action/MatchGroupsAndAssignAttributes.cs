@@ -16,7 +16,7 @@ using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
 
-namespace com.reallifeministries.RockExtensions.Workflow.Action
+namespace com.reallifeministries.GroupMatching.Workflow.Action
 {
    
     [Description( "Match groups and assign workgroup attributes from the matches" )]
