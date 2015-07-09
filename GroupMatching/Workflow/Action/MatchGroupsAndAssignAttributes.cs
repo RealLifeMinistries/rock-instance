@@ -94,7 +94,15 @@ namespace com.reallifeministries.GroupMatching.Workflow.Action
                                 try
                                 {
                                     var value = lava.ResolveMergeFields( mergeFields );
-                                    action.Activity.SetAttributeValue( key, value );
+                                    if (value.Contains( "Liquid Error" ))
+                                    {
+                                        action.AddLogEntry( "Liquid Error: " + value );
+                                    }
+                                    else
+                                    {
+                                        action.Activity.SetAttributeValue( key, value );
+                                    }
+                                    
                                 }
                                 catch (DotLiquid.Exceptions.LiquidException ex)
                                 {
@@ -108,7 +116,14 @@ namespace com.reallifeministries.GroupMatching.Workflow.Action
                                 try
                                 {
                                     var value = lava.ResolveMergeFields( mergeFields );
-                                    action.Activity.Workflow.SetAttributeValue( key, value );
+                                    if (value.Contains( "Liquid Error" ))
+                                    {
+                                        action.AddLogEntry( "Liquid Error: " + value );
+                                    }
+                                    else
+                                    {
+                                        action.Activity.Workflow.SetAttributeValue( key, value );
+                                    }
                                 }
                                 catch (DotLiquid.Exceptions.LiquidException ex)
                                 {
