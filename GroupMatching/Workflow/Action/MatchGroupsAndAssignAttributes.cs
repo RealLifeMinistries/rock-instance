@@ -91,29 +91,14 @@ namespace com.reallifeministries.GroupMatching.Workflow.Action
                             if (action.Activity.Attributes.ContainsKey( key ))
                             {
                                 var lava = attrList[key];
-                                try
-                                {
-                                    var value = lava.ResolveMergeFields( mergeFields );
-                                    action.Activity.SetAttributeValue( key, value );
-                                }
-                                catch (DotLiquid.Exceptions.LiquidException ex) 
-                                {
-                                    action.AddLogEntry( "Liquid Exception: " + ex.Message );
-                                }
-                                
+                                var value = lava.ResolveMergeFields( mergeFields );
+                                action.Activity.SetAttributeValue( key, value );
                             }
                             else if(action.Activity.Workflow.Attributes.ContainsKey( key ))
                             {
                                 var lava = attrList[key];
-                                try
-                                {
-                                    var value = lava.ResolveMergeFields( mergeFields );
-                                    action.Activity.Workflow.SetAttributeValue( key, value );
-                                }
-                                catch (DotLiquid.Exceptions.LiquidException ex) 
-                                {
-                                    action.AddLogEntry( "Liquid Exception: " + ex.Message );
-                                }
+                                var value = lava.ResolveMergeFields( mergeFields );
+                                action.Activity.Workflow.SetAttributeValue( key, value );
                             }
                         }
 
