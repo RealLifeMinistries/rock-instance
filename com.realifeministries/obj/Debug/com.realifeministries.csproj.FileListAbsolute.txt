@@ -1,0 +1,10 @@
+M:\Projects\rock-instance\com.realifeministries\obj\Debug\com.realifeministries.csprojResolveAssemblyReference.cache
+M:\Projects\rock-instance\com.realifeministries\bin\Debug\com.realifeministries.dll
+M:\Projects\rock-instance\com.realifeministries\bin\Debug\com.realifeministries.pdb
+M:\Projects\rock-instance\com.realifeministries\bin\Debug\EntityFramework.dll
+M:\Projects\rock-instance\com.realifeministries\bin\Debug\EntityFramework.xml
+M:\Projects\rock-instance\com.realifeministries\obj\Debug\com.realifeministries.dll
+M:\Projects\rock-instance\com.realifeministries\obj\Debug\com.realifeministries.pdb
+M:\Projects\rock-instance\com.realifeministries\bin\Debug\com.realifeministries.dll.config
+M:\Projects\rock-instance\com.realifeministries\bin\Debug\EntityFramework.SqlServer.dll
+M:\Projects\rock-instance\com.realifeministries\bin\Debug\EntityFramework.SqlServer.xml

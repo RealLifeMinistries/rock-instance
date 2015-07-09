@@ -1,0 +1,11 @@
+M:\Projects\rock-instance\GroupMatching\bin\Debug\com.reallifeministries.GroupMatching.dll
+M:\Projects\rock-instance\GroupMatching\bin\Debug\com.reallifeministries.GroupMatching.pdb
+M:\Projects\rock-instance\GroupMatching\bin\Debug\DotLiquid.dll
+M:\Projects\rock-instance\GroupMatching\bin\Debug\EntityFramework.dll
+M:\Projects\rock-instance\GroupMatching\bin\Debug\YamlDotNet.dll
+M:\Projects\rock-instance\GroupMatching\bin\Debug\EntityFramework.xml
+M:\Projects\rock-instance\GroupMatching\bin\Debug\YamlDotNet.pdb
+M:\Projects\rock-instance\GroupMatching\bin\Debug\YamlDotNet.xml
+M:\Projects\rock-instance\GroupMatching\obj\Debug\com.reallifeministries.GroupMatching.csprojResolveAssemblyReference.cache
+M:\Projects\rock-instance\GroupMatching\obj\Debug\com.reallifeministries.GroupMatching.dll
+M:\Projects\rock-instance\GroupMatching\obj\Debug\com.reallifeministries.GroupMatching.pdb

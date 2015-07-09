@@ -33,6 +33,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "com.reallifeministries.Rock
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "com.reallifeministries.GroupMatching", "GroupMatching\com.reallifeministries.GroupMatching.csproj", "{F18806FE-83BD-45E3-A230-323211DAAA72}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "com.realifeministries", "com.realifeministries\com.realifeministries.csproj", "{C8EDF442-B061-4308-8E61-9DA5F7C9881F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{F18806FE-83BD-45E3-A230-323211DAAA72}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F18806FE-83BD-45E3-A230-323211DAAA72}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F18806FE-83BD-45E3-A230-323211DAAA72}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C8EDF442-B061-4308-8E61-9DA5F7C9881F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8EDF442-B061-4308-8E61-9DA5F7C9881F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8EDF442-B061-4308-8E61-9DA5F7C9881F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8EDF442-B061-4308-8E61-9DA5F7C9881F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
