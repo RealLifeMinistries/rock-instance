@@ -94,7 +94,7 @@ namespace com.reallifeministries.GroupMatching.Workflow.Action
                                 try
                                 {
                                     var value = lava.ResolveMergeFields( mergeFields );
-                                    if (value.Contains( "Liquid Error" ))
+                                    if (value.Contains( "Liquid error" ))
                                     {
                                         action.AddLogEntry( "Liquid Error: " + value );
                                     }
@@ -116,7 +116,7 @@ namespace com.reallifeministries.GroupMatching.Workflow.Action
                                 try
                                 {
                                     var value = lava.ResolveMergeFields( mergeFields );
-                                    if (value.Contains( "Liquid Error" ))
+                                    if (value.Contains( "Liquid error" ))
                                     {
                                         action.AddLogEntry( "Liquid Error: " + value );
                                     }
