@@ -31,56 +31,17 @@ namespace com.reallifeministries.Attendance
         private DefinedValueCache _inactiveStatus = null;
         private bool _canView = false;
         private bool _takesAttendance = false;
-        private List<Rock.Model.Attendance> _attendances = null;
-
-        protected bool wasAttendanceTaken
+        private string _sortBy = null;
+        private bool _sortDescending
         {
-            get
-            {
-                if (attendanceList != null)
-                {
-                    return attendanceList.Count > 0;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-        }
-
-        private List<Rock.Model.Attendance> attendanceList
-        {
-            get
-            {
-                if (_attendances != null)
-                {
-                    return _attendances;
-                }
-                else
-                {
-                    if (ViewState["attendanceIds"] != null)
-                    {
-                        var attendanceService = new AttendanceService( ctx );
-                        var attendanceIds = new List<int>( ((Array) ViewState["attendanceIds"]).OfType<int>().ToList() );
-                        _attendances = attendanceService.GetByIds( attendanceIds ).ToList();
-                        return _attendances;
-                    }
-                    else
-                    {
-                        return null;
-                    }
-                }
+            get {
+                return Convert.ToBoolean(ViewState["sortDescending"]);
             }
             set
             {
-                _attendances = value;
-                if (value != null)
-                    ViewState["attendanceIds"] = (from a in value select a.Id).ToArray();
-                else
-                {
-                    ViewState["attendanceIds"] = null;
-                }
+                ViewState["sortDescending"] = value;
             }
+            
         }
 
         protected override void OnInit( EventArgs e )
@@ -129,58 +90,112 @@ namespace com.reallifeministries.Attendance
 
             if (_canView && _takesAttendance && !IsPostBack)
             {
-                BindPeopleList();
-                dpAttendanceDate.SelectedDate = DateTime.Now;
+                BindGrid();
+                dpAttendedDate.SelectedDateTime = DateTime.Now;
             }
-        }
+            
+        }    
 
-        protected void Page_PreRender( object sender, EventArgs e )
-        {
-            BindVisibility();
-        }
-
-        protected void BindVisibility()
-        {
-            pnlResults.Visible = wasAttendanceTaken;
-            pnlForm.Visible = (_canView && _takesAttendance && !wasAttendanceTaken);
-        }
-
-        protected void BindAttendanceList()
-        {
-            rptAttendees.DataSource = attendanceList;
-            rptAttendees.DataBind();
-        }
-
-        protected void BindPeopleList()
+        protected void BindGrid()
         {
             if (_group != null)
             {
                 _inactiveStatus = DefinedValueCache.Read( Rock.SystemGuid.DefinedValue.PERSON_RECORD_STATUS_INACTIVE );
 
+                Guid[] checkinPurposeTypes = {Rock.SystemGuid.DefinedValue.GROUPTYPE_PURPOSE_CHECKIN_FILTER.AsGuid(), 
+                                              Rock.SystemGuid.DefinedValue.GROUPTYPE_PURPOSE_CHECKIN_TEMPLATE.AsGuid()};
 
+                var weekendServiceGroupIds = (from g in ctx.Groups
+                                              where checkinPurposeTypes.Contains( g.GroupType.GroupTypePurposeValue.Guid )
+                                              select g.Id).ToList();
+                
 
                 var query = (from gm in ctx.GroupMembers
                              where gm.GroupId == _group.Id && gm.Person.RecordStatusValueId != _inactiveStatus.Id
-                             orderby gm.GroupRole.Order, gm.Person.LastName
+                             orderby gm.Person.LastName, gm.Person.FirstName
                              select new
                              {
                                  PersonId = gm.PersonId,
                                  Person = gm.Person,
                                  Role = gm.GroupRole
                              });
-                var groupMembers = (from d in query.ToList()
+
+                var wkAttendance = (from a in ctx.Attendances
+                                    where query.Select(d => d.PersonId).ToList().Contains(a.PersonAlias.PersonId)
+                                    where a.DidAttend == true
+                                    where weekendServiceGroupIds.Contains( a.GroupId.Value )
+                                    group a by a.PersonAlias.PersonId into attPerson
                                     select new
                                     {
-                                        PersonId = d.PersonId,
-                                        PersonDisplay = d.Person.FullName/* + " ( " + d.Role.Name + " )"*/
+                                        PersonId = attPerson.Key,
+                                        LastWeekendAttended = attPerson.Max(a => a.StartDateTime)
+                                    }).ToList();
+
+                ;
+
+                var grpAttendance = (from a in ctx.Attendances
+                                    where query.Select( d => d.PersonId ).ToList().Contains( a.PersonAlias.PersonId )
+                                    where a.GroupId.Value == _group.Id
+                                    where a.DidAttend == true
+                                    group a by a.PersonAlias.PersonId into attPerson
+                                    select new
+                                    {
+                                        PersonId = attPerson.Key,
+                                        LastAttendedGroup = attPerson.Max( a => a.StartDateTime )
+                                    }).ToList();
+
+                var members = query.ToList();
+               
+                var groupMembers = (from d in members
+                                    let lastWeekendAttended = (
+                                        from wa in wkAttendance 
+                                        where d.PersonId == wa.PersonId
+                                        select wa.LastWeekendAttended).FirstOrDefault()
+                                    let lastGroupAttended = (
+                                         from ga in grpAttendance
+                                         where d.PersonId == ga.PersonId
+                                         select ga.LastAttendedGroup).FirstOrDefault()
+                                    select new
+                                    {
+                                        Person = d.Person,
+                                        lastAttendedService = lastWeekendAttended,
+                                        lastAttendedGroup = lastGroupAttended
                                     });
-                cblMembers.DataSource = groupMembers.ToList();
-                cblMembers.DataValueField = "PersonId";
-                cblMembers.DataTextField = "PersonDisplay";
-                cblMembers.DataBind();
+
+                var results = groupMembers;
+                switch (_sortBy)
+                {
+                    case "attendedWeekend":
+                        results = groupMembers.OrderBy( a => a.lastAttendedService ).ToList();
+                        break;
+                    case "attendedGroup":
+                       results = groupMembers.OrderBy( a => a.lastAttendedGroup ).ToList();
+                       break;
+                    default:
+                        results = groupMembers.OrderBy( a => a.Person.LastName ).ThenBy( a => a.Person.FirstName ).ToList();
+                        break;
+                }
+                if(_sortDescending)
+                {
+                    results = results.Reverse();
+                }
+                rptAttendees.DataSource = results;
+                rptAttendees.DataBind();
             }
         }
 
+        public string ElaspedTime(System.DateTime? dt)
+        {
+            if (dt == null || dt < (new DateTime( 2000 )))
+            {
+                return "Never";
+            }
+            else
+            {
+                return dt.ToElapsedString( false, true );
+            }
+            
+        }
         protected void FlashMessage( String message )
         {
             FlashMessage( message, NotificationBoxType.Info );
@@ -208,23 +223,20 @@ namespace com.reallifeministries.Attendance
                 FlashMessage( "Your security level does not allow this action" , NotificationBoxType.Warning);
             }
         }
-        protected void btnReset_Click( object sender, EventArgs e )
-        {
-            resetCheckBoxes();
-            attendanceList = null;
-            BindAttendanceList();
-        }
-       
+               
         protected void btnRecordAttendance_Click( object sender, EventArgs e )
         {
-            if (dpAttendanceDate.SelectedDate != null)
+            
+            if (!dpAttendedDate.SelectedDateTimeIsBlank)
             {
                 var attendendPeopleIds = new List<int>();
-                foreach (ListItem item in cblMembers.Items)
+                foreach (RepeaterItem item in rptAttendees.Items)
                 {
-                    if (item.Selected)
+                    var cb = item.FindControl("didAttend") as CheckBox;
+                    if (cb.Checked)
                     {
-                        attendendPeopleIds.Add( Int32.Parse(item.Value) );
+                        var personId = item.FindControl( "personId" ) as HiddenField;
+                        attendendPeopleIds.Add( Int32.Parse(personId.Value) );
                     }
                 }
 
@@ -240,9 +252,10 @@ namespace com.reallifeministries.Attendance
                         var attendance = new Rock.Model.Attendance();
                         attendance.PersonAlias = person.PrimaryAlias;
                         attendance.Group = _group;
+                        attendance.DidAttend = true;
                         // ADD GROUP LOCATION ?
                         
-                        attendance.StartDateTime = (DateTime)dpAttendanceDate.SelectedDate;
+                        attendance.StartDateTime = (DateTime)dpAttendedDate.SelectedDateTime;
                         if (attendance.IsValid)
                         {
                             attendanceService.Add( attendance );
@@ -251,18 +264,15 @@ namespace com.reallifeministries.Attendance
                     }
 
                     ctx.SaveChanges();
+                    
                     FlashMessage( string.Format(
                         "Attendance Recorded for {1} people on {0}", 
-                        dpAttendanceDate.SelectedDate.Value.ToLongDateString(),
+                        dpAttendedDate.SelectedDateTime.Value.ToShortTimeString(),
                         attendendPeopleIds.Count
                     ), NotificationBoxType.Success);
 
-
-                    attendanceList = attendances;
-
-                    BindAttendanceList();
-
                     resetCheckBoxes();
+                    BindGrid();
                 }
                 else
                 {
@@ -274,34 +284,22 @@ namespace com.reallifeministries.Attendance
                 FlashMessage( "Attended Date is required" , NotificationBoxType.Danger );
             }
         }
-
+        protected void SortGrid(Object sender, CommandEventArgs e)
+        {
+            _sortBy = e.CommandName.ToString();
+    
+            _sortDescending = !_sortDescending;
+           
+            BindGrid();
+        }
         protected void resetCheckBoxes()
         {
-            foreach (ListItem item in cblMembers.Items)
+            cbCheckall.Checked = false;
+            foreach (RepeaterItem i in rptAttendees.Items)
             {
-                item.Selected = false;
+                var cb = i.FindControl("didAttend") as CheckBox;
+                cb.Checked = false;
             }
         }
-        protected void rptAttendees_ItemCommand( object source, RepeaterCommandEventArgs e )
-        {
-            var attendId = Int32.Parse( e.CommandArgument.ToString() );
-            var attendanceService = new Rock.Model.AttendanceService( ctx );
-            var attendance = attendanceService.Get( attendId );
-            var newList = new List<Rock.Model.Attendance>();
-
-            attendanceService.Delete(attendance);
-            ctx.SaveChanges();
-            
-            foreach(var item in attendanceList) {
-                if (item.Id != attendId)
-                {
-                    newList.Add( item );
-                }
-            }
-
-            attendanceList = newList;
-            BindAttendanceList();           
-        }
-}
-
+    }
 }

@@ -4,54 +4,57 @@
     <ContentTemplate>
         <Rock:PanelWidget runat="server" ID="pnlMain" Title="Group Attendance" Expanded="true">
             <Rock:NotificationBox runat="server" ID="nbMessage" Visible="false" />
-            <asp:Panel runat="server" ID="pnlForm" Visible="false">
-                <Rock:DatePicker runat="server"  id="dpAttendanceDate" Required="true" Label="Attended Date" />
-                <Rock:RockCheckBoxList runat="server" ID="cblMembers" Label="Attendees" DataTextField="Person.Name" DataValueField="Id" />
-                <Rock:BootstrapButton Text="Record Attendance" runat="server" OnClick="btnRecordAttendance_Click" ID="btnRecordAttendance" CssClass='btn btn-primary' DataLoadingText="Saving..." />
-          </asp:Panel>
-          <asp:Panel runat="server" ID="pnlResults" Visible="false">
+            
+          <asp:Panel runat="server" ID="pnlResults" Visible="true">
               <h4>Attendees</h4>
-              <asp:Repeater runat="server" ID="rptAttendees" OnItemCommand="rptAttendees_ItemCommand">
-                  <HeaderTemplate>
-                      <ul>
-                  </HeaderTemplate>
-                  <ItemTemplate>
-                      <li><%# Eval("PersonAlias.Person.FullName")%>
-                          <Rock:BootstrapButton ID='btnUndo' runat="server" CommandName="Undo" CommandArgument='<%# Eval("Id")%>' 
-                              CssClass="btn btn-text">
-                              <i class='fa fa-ban'></i> Oops..
-                          </Rock:BootstrapButton>
-                      </li>
-                  </ItemTemplate>
-                  <FooterTemplate>
-                      </ul>
-                  </FooterTemplate>
-              </asp:Repeater>
-              <Rock:BootstrapButton runat="server" CssClass="btn btn-primary" OnClick="btnReset_Click" ID="btnReset" Text="Record More Attendees" />
+              <div class="table-responsive">
+                  <table class="table table-striped table-bordered table-hover">
+                      <thead>
+                        <tr>
+                            <th>
+                                <asp:LinkButton runat="server" OnCommand="SortGrid" CommandName="PersonName" Text="Person"/>
+                            </th>
+                            <th><asp:LinkButton runat="server" OnCommand="SortGrid" CommandName="attendedWeekend" Text="Last Attended Service"/></th>
+                            <th><asp:LinkButton runat="server" OnCommand="SortGrid" CommandName="attendedGroup" Text="Last Attended Group"/></th>
+                            <th><asp:CheckBox runat="server" CssClass="checkall" ID="cbCheckall" /></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                          <asp:Repeater ID="rptAttendees" runat="server">
+                              <ItemTemplate>
+                                  <tr>
+                                      <td><%#Eval("Person.FullName") %></td>
+                                      <td><%#ElaspedTime((System.DateTime?)Eval( "lastAttendedService" )) %></td>
+                                      <td><%#ElaspedTime((System.DateTime?)Eval( "lastAttendedGroup" )) %></td>
+                                      <td>
+                                          <asp:CheckBox runat="server" ID="didAttend" />
+                                          <asp:HiddenField runat="server" ID="personId" Value='<%#Eval("Person.Id")%>' />
+                                      </td>
+                                  </tr>
+                              </ItemTemplate>
+                          </asp:Repeater>
+                      </tbody>
+                      <tfoot>
+                          <tr>
+                              <td colspan="4" class="text-right form-inline">
+                                      <Rock:DateTimePicker runat="server" ID="dpAttendedDate" Label="Record Attendance For " />
+                                      <Rock:BootstrapButton runat="server" ID="btnRecordAttendance" cssclass="btn btn-primary" Text="Record" OnClick="btnRecordAttendance_Click" />
+                                  
+                              </td>
+                          </tr>
+                      </tfoot>
+                  </table>
+              </div>
+              <script>
+                  var $checkAll = $("#<%=cbCheckall.ClientID%>");
+                  $checkAll.on('change', function () {
+                      $checkAll.closest('table').find('tbody input[type=checkbox]').prop('checked', $checkAll.prop('checked'));
+                  });
+              </script>
           </asp:Panel>
+          
          
         </Rock:PanelWidget> 
     </ContentTemplate>
 </Rock:RockUpdatePanel>
 
-<script>
-    function addCheckAll() {
-        $('#<%= pnlForm.ClientID %>').find('.rock-check-box-list > label')
-            .prepend('<input type="checkbox" class="checkAll" /> ');
-    }
-    jQuery(function ($) {
-        addCheckAll();
-        
-        $(<%= rupMain.ClientID %>).on('change', 'input[type=checkbox].checkAll', function (e) {
-            var $checkAll = $(this);
-            var $label = $checkAll.closest('label');
-            $label.nextAll('.controls').find(':checkbox').each(function () {
-                this.checked = $checkAll.prop('checked');
-            });
-        });
-    });
-    var prm = Sys.WebForms.PageRequestManager.getInstance();
-    prm.add_endRequest(addCheckAll);
-
-</script>
-     
