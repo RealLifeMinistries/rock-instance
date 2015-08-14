@@ -158,6 +158,7 @@ namespace com.reallifeministries.Attendance
                                     select new
                                     {
                                         Person = d.Person,
+                                        Role = d.Role,
                                         lastAttendedService = lastWeekendAttended,
                                         lastAttendedGroup = lastGroupAttended
                                     });

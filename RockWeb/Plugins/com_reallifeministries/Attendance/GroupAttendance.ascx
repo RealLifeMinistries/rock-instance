@@ -23,7 +23,10 @@
                           <asp:Repeater ID="rptAttendees" runat="server">
                               <ItemTemplate>
                                   <tr>
-                                      <td><%#Eval("Person.FullName") %></td>
+                                      <td>
+                                          <%#Eval("Person.FullName") %>
+                                          <span class="label label-default"><%#Eval("Role.Name") %></span>
+                                      </td>
                                       <td><%#ElaspedTime((System.DateTime?)Eval( "lastAttendedService" )) %></td>
                                       <td><%#ElaspedTime((System.DateTime?)Eval( "lastAttendedGroup" )) %></td>
                                       <td>
