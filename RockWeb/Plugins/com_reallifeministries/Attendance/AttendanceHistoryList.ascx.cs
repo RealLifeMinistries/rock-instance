@@ -78,7 +78,8 @@ namespace com.reallifeministries.Attendance
                     _person = contextEntity as Person;
                 }
             }
-            this.GroupTypeGuids = GetAttributeValue("ShowGroupTypes").Split(new char[]{','}).Select(g => g.AsGuid()).ToList();
+            var showGroupTypes = GetAttributeValue( "ShowGroupTypes" ).Split( new char[] { ',' } ).Where( s => !String.IsNullOrEmpty(s));
+            this.GroupTypeGuids = showGroupTypes.Select(g => g.AsGuid()).ToList();
             
             if ( !Page.IsPostBack )
             {
@@ -191,7 +192,11 @@ namespace com.reallifeministries.Attendance
                 var attendanceQuery = attendanceService.Queryable( "PersonAlias.Person" );
 
                 attendanceQuery = attendanceQuery.Where( a => a.PersonAlias.PersonId == _person.Id );
-                attendanceQuery = attendanceQuery.Where( a => this.GroupTypeGuids.Contains( a.Group.GroupType.Guid ) );
+
+                if (this.GroupTypeGuids.Count > 0)
+                {
+                    attendanceQuery = attendanceQuery.Where( a => this.GroupTypeGuids.Contains( a.Group.GroupType.Guid ) );
+                }
 
 
                 var attendanceList = attendanceQuery.ToList();
@@ -229,9 +234,6 @@ namespace com.reallifeministries.Attendance
                     }
                 }
 
-                var limit = GetAttributeValue("Limit").AsInteger();
-                qry = qry.Take(limit);
-
                 SortProperty sortProperty = gHistory.SortProperty;
                 if (sortProperty != null)
                 {
@@ -241,6 +243,9 @@ namespace com.reallifeministries.Attendance
                 {
                     qry = qry.OrderByDescending( p => p.StartDateTime );
                 }
+
+                var limit = GetAttributeValue( "Limit" ).AsInteger();
+                qry = qry.Take( limit );
 
                 gHistory.DataSource = qry.ToList();
 
