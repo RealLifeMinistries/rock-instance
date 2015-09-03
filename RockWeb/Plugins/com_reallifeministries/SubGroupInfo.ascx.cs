@@ -123,6 +123,8 @@ namespace com.reallifeministries
                         ActiveMembers = g.Members.Where(m => m.GroupMemberStatus == GroupMemberStatus.Active).Count()
                     }
                 ).ToList();
+                gSubGroups.DataSource = subGroups;
+                gSubGroups.DataBind();
             }
             else
             {
