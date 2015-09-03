@@ -88,7 +88,7 @@ namespace RockWeb
         {
             Response.Headers.Remove( "Server" );
             Response.Headers.Remove( "X-AspNet-Version" );
-            Response.AddHeader( "X-Frame-Options", "SAMEORIGIN" );
+            //Response.AddHeader( "X-Frame-Options", "SAMEORIGIN" );
         }
 
         /// <summary>
