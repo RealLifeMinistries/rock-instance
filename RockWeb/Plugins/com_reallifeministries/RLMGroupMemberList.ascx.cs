@@ -99,6 +99,13 @@ namespace com.reallifeministries
                     bool canEditBlock = IsUserAuthorized( Authorization.EDIT ) || _group.IsAuthorized( Authorization.EDIT, this.CurrentPerson );
                     gGroupMembers.Actions.ShowAdd = canEditBlock;
                     gGroupMembers.IsDeleteEnabled = canEditBlock;
+                    if (canEditBlock)
+                    {
+                        // Add delete column
+                        var deleteField = new DeleteField();
+                        gGroupMembers.Columns.Add( deleteField );
+                        deleteField.Click += DeleteGroupMember_Click;
+                    }
                 }
             }
         }
@@ -131,7 +138,7 @@ namespace com.reallifeministries
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.Web.UI.WebControls.GridViewRowEventArgs"/> instance containing the event data.</param>
-        void gGroupMembers_RowDataBound( object sender, System.Web.UI.WebControls.GridViewRowEventArgs e )
+        protected void gGroupMembers_RowDataBound( object sender, System.Web.UI.WebControls.GridViewRowEventArgs e )
         {
             if ( e.Row.RowType == DataControlRowType.DataRow )
             {
@@ -143,12 +150,18 @@ namespace com.reallifeministries
                         groupMember.Person.RecordStatusValueId == _inactiveStatus.Id )
                     {
                         e.Row.AddCssClass( "inactive" );
+                        e.Row.ToolTip = "Inactive member";
                     }
 
                     if ( groupMember.Person.IsDeceased ?? false )
                     {
                         e.Row.AddCssClass( "deceased" );
+                        e.Row.ToolTip = "Deceased";
                     }
+                    
+                    var linkControl = (HyperLink)e.Row.FindControl( "lnkProfile" );
+                    linkControl.NavigateUrl = LinkedPageUrl( "PersonProfilePage", new Dictionary<string, string>() { { "PersonId", groupMember.PersonId.ToString() } } );
+                    var navi = linkControl.NavigateUrl; 
                 }
             }
         }
@@ -214,6 +227,13 @@ namespace com.reallifeministries
             if ( groupMember != null )
             {
                 string errorMessage;
+                if (!groupMember.Group.IsAuthorized( Authorization.EDIT, this.CurrentPerson ))
+                {
+                    errorMessage = "You're not authorized to remove this Person";
+                    mdGridWarning.Show( errorMessage, ModalAlertType.Warning );
+                    return;
+                }
+
                 if ( !groupMemberService.CanDelete( groupMember, out errorMessage ) )
                 {
                     mdGridWarning.Show( errorMessage, ModalAlertType.Information );
@@ -282,7 +302,7 @@ namespace com.reallifeministries
             string showSubGroups = rFilter.GetUserPreference( MakeKeyUniqueToGroup( "Show Sub Groups" ) );
             if (string.IsNullOrWhiteSpace( showSubGroups ))
             {
-                tglSubGroups.Checked = true;
+                tglSubGroups.Checked = false;
             }
             else
             {
@@ -335,23 +355,6 @@ namespace com.reallifeministries
 
         }
 
-
-        /// <summary>
-        /// Adds the column with a link to profile page.
-        /// </summary>
-        private void AddPersonProfileLinkColumn()
-        {
-            HyperLinkField hlPersonProfileLink = new HyperLinkField();
-            hlPersonProfileLink.ItemStyle.HorizontalAlign = HorizontalAlign.Center;
-            hlPersonProfileLink.HeaderStyle.CssClass = "grid-columncommand";
-            hlPersonProfileLink.ItemStyle.CssClass = "grid-columncommand";
-            hlPersonProfileLink.DataNavigateUrlFields = new String[1] { "PersonId" };
-            hlPersonProfileLink.DataNavigateUrlFormatString = LinkedPageUrl( "PersonProfilePage", new Dictionary<string, string> { { "PersonId", "###" } } ).Replace( "###", "{0}" );
-            hlPersonProfileLink.DataTextFormatString = "<div class='btn btn-default'><i class='fa fa-user'></i></div>";
-            hlPersonProfileLink.DataTextField = "PersonId";
-            gGroupMembers.Columns.Add( hlPersonProfileLink );
-        }
-
         /// <summary>
         /// Binds the group members grid.
         /// </summary>
@@ -374,89 +377,80 @@ namespace com.reallifeministries
                     var descendedGroups = groupService.GetAllDescendents( _group.Id ).ToList();
                     groups.AddRange( descendedGroups );
                 }
+  
+                nbRoleWarning.Visible = false;
+                rFilter.Visible = true;
+                gGroupMembers.Visible = true;
 
-               
-                    nbRoleWarning.Visible = false;
-                    rFilter.Visible = true;
-                    gGroupMembers.Visible = true;
+                var groupIds = groups.Select( g => g.Id ).ToList();
 
-                    var groupIds = groups.Select( g => g.Id ).ToList();
+                GroupMemberService groupMemberService = new GroupMemberService( rockContext );
+                var qry = groupMemberService.Queryable( "Person,GroupRole,Group", true )
+                    .Where( m => groupIds.Contains( m.GroupId ) );
 
-                    GroupMemberService groupMemberService = new GroupMemberService( rockContext );
-                    var qry = groupMemberService.Queryable( "Person,GroupRole,Group", true )
-                        .Where( m => groupIds.Contains( m.GroupId ) );
+                // Filter by First Name
+                string firstName = tbFirstName.Text;
+                if ( !string.IsNullOrWhiteSpace( firstName ) )
+                {
+                    qry = qry.Where( m => m.Person.FirstName.StartsWith( firstName ) );
+                }
 
-                    // Filter by First Name
-                    string firstName = tbFirstName.Text;
-                    if ( !string.IsNullOrWhiteSpace( firstName ) )
-                    {
-                        qry = qry.Where( m => m.Person.FirstName.StartsWith( firstName ) );
-                    }
+                // Filter by Last Name
+                string lastName = tbLastName.Text;
+                if ( !string.IsNullOrWhiteSpace( lastName ) )
+                {
+                    qry = qry.Where( m => m.Person.LastName.StartsWith( lastName ) );
+                }
 
-                    // Filter by Last Name
-                    string lastName = tbLastName.Text;
-                    if ( !string.IsNullOrWhiteSpace( lastName ) )
-                    {
-                        qry = qry.Where( m => m.Person.LastName.StartsWith( lastName ) );
-                    }
-
-                    var roles = cblRole.SelectedValues;
+                var roles = cblRole.SelectedValues;
                     
-                    if ( roles.Any() )
+                if ( roles.Any() )
+                {
+                    qry = qry.Where( m => roles.Contains( m.GroupRole.Name ) );
+                }
+
+                // Filter by Status
+                var statuses = new List<GroupMemberStatus>();
+                foreach ( string status in cblStatus.SelectedValues )
+                {
+                    if ( !string.IsNullOrWhiteSpace( status ) )
                     {
-                        qry = qry.Where( m => roles.Contains( m.GroupRole.Name ) );
+                        statuses.Add( status.ConvertToEnum<GroupMemberStatus>() );
                     }
+                }
+                if ( statuses.Any() )
+                {
+                    qry = qry.Where( m => statuses.Contains( m.GroupMemberStatus ) );
+                }
 
-                    // Filter by Status
-                    var statuses = new List<GroupMemberStatus>();
-                    foreach ( string status in cblStatus.SelectedValues )
-                    {
-                        if ( !string.IsNullOrWhiteSpace( status ) )
-                        {
-                            statuses.Add( status.ConvertToEnum<GroupMemberStatus>() );
-                        }
-                    }
-                    if ( statuses.Any() )
-                    {
-                        qry = qry.Where( m => statuses.Contains( m.GroupMemberStatus ) );
-                    }
+                _inactiveStatus = DefinedValueCache.Read( Rock.SystemGuid.DefinedValue.PERSON_RECORD_STATUS_INACTIVE );
 
-                    
+                SortProperty sortProperty = gGroupMembers.SortProperty;
 
+                List<GroupMember> groupMembers = null;
 
-                    _inactiveStatus = DefinedValueCache.Read( Rock.SystemGuid.DefinedValue.PERSON_RECORD_STATUS_INACTIVE );
+                if ( sortProperty != null )
+                {
+                    groupMembers = qry.Sort( sortProperty ).ToList();
+                }
+                else
+                {
+                    groupMembers = qry.OrderBy( a => a.Person.LastName ).ThenBy( a => a.Person.FirstName ).ToList();
+                }
+                                                          
+                gGroupMembers.DataSource = groupMembers/*.Select( m => new
+                {
+                    m.Id,
+                    m.Guid,
+                    m.PersonId,
+                    m.Person,
+                    Group = m.Group.Name,
+                    Name = m.Person.NickName + " " + m.Person.LastName,
+                    GroupRole = m.GroupRole.Name,
+                    m.GroupMemberStatus
+                } )*/.ToList();
 
-                    SortProperty sortProperty = gGroupMembers.SortProperty;
-
-                    List<GroupMember> groupMembers = null;
-
-                    if ( sortProperty != null )
-                    {
-                        groupMembers = qry.Sort( sortProperty ).ToList();
-                    }
-                    else
-                    {
-                        groupMembers = qry.OrderBy( a => a.Person.LastName ).ThenBy( a => a.Person.FirstName ).ToList();
-                    }
-                    
-
-                    // Since we're not binding to actual group member list, but are using AttributeField columns,
-                    // we need to save the workflows into the grid's object list
-                    //gGroupMembers.ObjectList = new Dictionary<string, object>();
-                    //groupMembers.ForEach( m => gGroupMembers.ObjectList.Add( m.Id.ToString(), m ) );
-                    
-                    gGroupMembers.DataSource = groupMembers.Select( m => new
-                    {
-                        m.Id,
-                        m.Guid,
-                        m.PersonId,
-                        Group = m.Group.Name,
-                        Name = m.Person.NickName + " " + m.Person.LastName,
-                        GroupRole = m.GroupRole.Name,
-                        m.GroupMemberStatus
-                    } ).ToList();
-
-                    gGroupMembers.DataBind();
+                gGroupMembers.DataBind();
             }
             else
             {

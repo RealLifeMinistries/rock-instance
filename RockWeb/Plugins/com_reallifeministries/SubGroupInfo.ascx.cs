@@ -67,6 +67,7 @@ namespace com.reallifeministries
                 {
                     _canView = true;
                 }
+                pnlContent.Visible = _canView;
             }
         } 
 
@@ -80,7 +81,7 @@ namespace com.reallifeministries
 
             if ( !Page.IsPostBack )
             {
-                pnlContent.Visible = _canView;
+                
                 if ( _canView )
                 {
                     BindSubGroupsGrid();
@@ -111,25 +112,41 @@ namespace com.reallifeministries
         {
             if (_group != null)
             {
-                gSubGroups.Visible = true;
-
                 var rockContext = new RockContext();
 
-                var subGroups = rockContext.Groups.OrderBy(g => g.Name).Where( g => g.ParentGroupId == _group.Id ).Select( g => new
-                    {
-                        Group = g,
-                        GroupId = g.Id,
-                        InactiveMembers = g.Members.Where(m => m.GroupMemberStatus == GroupMemberStatus.Inactive).Count(),
+                var subGroups = rockContext.Groups.Where( g => g.ParentGroupId == _group.Id ).ToList();
+                if (subGroups.Count > 0)
+                {
+                    
+                    var groupService = new GroupService( rockContext );
+                    var subGroupsAndSubMembers = (
+                        from g in subGroups
+                        let groupIds = (groupService.GetAllDescendents(g.Id).Select(a => a.Id).ToList().Concat(new List<int>(){g.Id}))
+                        select new {
+                            Group = g,
+                            Members = rockContext.GroupMembers.Where(m => groupIds.Contains(m.GroupId)).ToList()
+                        }
+                    );
+
+                    var subGroupMemberCounts = subGroupsAndSubMembers.OrderBy(a => a.Group.Name).Select(g => new {
+                        GroupId = g.Group.Id,
+                        Group = g.Group,
+                        InactiveMembers = g.Members.Where( m => m.GroupMemberStatus == GroupMemberStatus.Inactive ).Count(),
                         PendingMembers = g.Members.Where( m => m.GroupMemberStatus == GroupMemberStatus.Pending ).Count(),
-                        ActiveMembers = g.Members.Where(m => m.GroupMemberStatus == GroupMemberStatus.Active).Count()
-                    }
-                ).ToList();
-                gSubGroups.DataSource = subGroups.ToList();
-                gSubGroups.DataBind();
+                        ActiveMembers = g.Members.Where( m => m.GroupMemberStatus == GroupMemberStatus.Active ).Count()
+                    }).ToList();
+                        
+                    gSubGroups.DataSource = subGroupMemberCounts;
+                    gSubGroups.DataBind();
+                }  
+                else
+                {
+                    pnlContent.Visible = false;
+                }                  
             }
             else
             {
-                gSubGroups.Visible = false;
+                pnlContent.Visible = false; ;
             }
         }
 

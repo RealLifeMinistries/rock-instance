@@ -30,13 +30,37 @@
                                 <Rock:RockCheckBoxList ID="cblRole" runat="server" Label="Role" RepeatDirection="Horizontal" />
                                 <Rock:RockCheckBoxList ID="cblStatus" runat="server" Label="Status" RepeatDirection="Horizontal" />
                             </Rock:GridFilter>
-                            <Rock:Grid ID="gGroupMembers" runat="server" DisplayType="Full" AllowPaging="true" AllowSorting="true" OnRowSelected="gGroupMembers_Edit">
+                            <Rock:Grid ID="gGroupMembers" runat="server" DisplayType="Full" AllowPaging="true" AllowSorting="true" 
+                                OnRowSelected="gGroupMembers_Edit" OnRowDataBound="gGroupMembers_RowDataBound">
                                 <Columns>
                                     <Rock:SelectField></Rock:SelectField>
-                                    <Rock:RockBoundField DataField="Name" HeaderText="Name" SortExpression="Person.LastName,Person.NickName" />
-                                    <Rock:RockBoundField DataField="Group" HeaderText="Group" SortExpression="Group.Name" />
-                                    <Rock:RockBoundField DataField="GroupRole" HeaderText="Role" SortExpression="GroupRole.Name" />
-                                    <Rock:RockBoundField DataField="GroupMemberStatus" HeaderText="Status" SortExpression="GroupMemberStatus" />
+                                    <asp:TemplateField HeaderText="Name" SortExpression="Person.LastName,Person.NickName">
+                                        <ItemTemplate>
+                                            <%#Eval("Person.FullName") %>
+                                        </ItemTemplate>
+                                    </asp:TemplateField>
+                                    <asp:TemplateField ItemStyle-CssClass="grid-columncommand" HeaderStyle-CssClass="grid-columncommand">
+                                        <ItemTemplate>
+                                            <asp:HyperLink runat="server" ID="lnkProfile">
+                                                <div class='btn btn-default'><i class='fa fa-user'></i></div>
+                                            </asp:HyperLink>
+                                        </ItemTemplate>
+                                    </asp:TemplateField>
+                                    <asp:TemplateField HeaderText="Group" SortExpression="Group.Name">
+                                        <ItemTemplate>
+                                            <%#Eval("Group.Name") %>
+                                        </ItemTemplate>
+                                    </asp:TemplateField>
+                                    <asp:TemplateField HeaderText="Role" SortExpression="GroupRole.Name">
+                                        <ItemTemplate>
+                                            <%#Eval("GroupRole.Name") %>
+                                        </ItemTemplate>
+                                    </asp:TemplateField>
+                                    <asp:TemplateField HeaderText="Status" SortExpression="GroupMemberStatus">
+                                        <ItemTemplate>
+                                            <%#Eval("GroupMemberStatus") %>
+                                        </ItemTemplate>
+                                    </asp:TemplateField>
                                 </Columns>
                             </Rock:Grid>
                         </div>

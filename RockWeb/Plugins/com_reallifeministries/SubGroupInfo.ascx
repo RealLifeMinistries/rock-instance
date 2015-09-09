@@ -15,8 +15,7 @@
                 <div class="panel-body">
                     <Rock:ModalAlert ID="mdGridWarning" runat="server" />
                     <div class="grid grid-panel">
-                        <Rock:Grid runat="server" ID="gSubGroups" OnGridRebind="gSubGroups_GridRebind" 
-                            Caption="Direct Sub Groups, (Member count not reflective of sub-sub-groups)"
+                        <Rock:Grid runat="server" ID="gSubGroups" OnGridRebind="gSubGroups_GridRebind"
                             OnRowSelected="gSubGroups_RowSelected" DataKeyNames="GroupId">
                             <Columns>
                                 <Rock:RockBoundField DataField="Group.Name" HeaderText="Name" />
