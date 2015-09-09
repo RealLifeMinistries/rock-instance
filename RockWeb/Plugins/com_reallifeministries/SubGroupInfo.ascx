@@ -3,15 +3,32 @@
 <asp:UpdatePanel runat="server">
     <ContentTemplate>
         <asp:panel ID="pnlContent" runat="server">
-            
-            <Rock:Grid runat="server" ID="gSubGroups" OnGridRebind="gSubGroups_GridRebind">
-                <Columns>
-                    <Rock:RockBoundField DataField="Group.Name" HeaderText="Name" />
-                    <Rock:RockBoundField DataField="ActiveMembers" HeaderText="Active" />
-                    <Rock:RockBoundField DataField="InactiveMembers" HeaderText="Inactive" />
-                    <Rock:RockBoundField DataField="PendingMembers" HeaderText="Pending" />
-                </Columns>
-            </Rock:Grid>
+            <div class="panel panel-block">
+                
+                <div class="panel-heading clearfix">
+                    <h1 class="panel-title pull-left">
+                        <i class="fa fa-users"></i>
+                        <asp:Literal ID="lHeading" runat="server" Text="Sub Groups" />
+                    </h1>
+                </div>
+
+                <div class="panel-body">
+                    <Rock:ModalAlert ID="mdGridWarning" runat="server" />
+                    <div class="grid grid-panel">
+                        <Rock:Grid runat="server" ID="gSubGroups" OnGridRebind="gSubGroups_GridRebind" 
+                            Caption="Direct Sub Groups, (Member count not reflective of sub-sub-groups)"
+                            OnRowSelected="gSubGroups_RowSelected" DataKeyNames="GroupId">
+                            <Columns>
+                                <Rock:RockBoundField DataField="Group.Name" HeaderText="Name" />
+                                <Rock:RockBoundField DataField="ActiveMembers" HeaderText="Active" />
+                                <Rock:RockBoundField DataField="InactiveMembers" HeaderText="Inactive" />
+                                <Rock:RockBoundField DataField="PendingMembers" HeaderText="Pending" />
+                            </Columns>
+                        </Rock:Grid>
+                    </div>
+                </div>
+
+            </div>
         </asp:panel>
     </ContentTemplate>
 </asp:UpdatePanel>

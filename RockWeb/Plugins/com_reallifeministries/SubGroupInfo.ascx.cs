@@ -22,7 +22,7 @@ namespace com.reallifeministries
     [Description( "Lists all the sub groups of the given group & member counts" )]
 
     [GroupField( "Group", "Either pick a specific group or choose <none> to have group be determined by the groupId page parameter" )]
-    [LinkedPage( "Detail Page" )]
+    [LinkedPage( "Detail Page","A detail page to go to when a group is clicked. Default same page", false )]
     public partial class SubGroupInfo : Rock.Web.UI.RockBlock, ISecondaryBlock
     {
         #region Private Variables
@@ -115,15 +115,16 @@ namespace com.reallifeministries
 
                 var rockContext = new RockContext();
 
-                var subGroups = rockContext.Groups.Where( g => g.ParentGroupId == _group.Id ).Select( g => new
+                var subGroups = rockContext.Groups.OrderBy(g => g.Name).Where( g => g.ParentGroupId == _group.Id ).Select( g => new
                     {
                         Group = g,
+                        GroupId = g.Id,
                         InactiveMembers = g.Members.Where(m => m.GroupMemberStatus == GroupMemberStatus.Inactive).Count(),
                         PendingMembers = g.Members.Where( m => m.GroupMemberStatus == GroupMemberStatus.Pending ).Count(),
                         ActiveMembers = g.Members.Where(m => m.GroupMemberStatus == GroupMemberStatus.Active).Count()
                     }
                 ).ToList();
-                gSubGroups.DataSource = subGroups;
+                gSubGroups.DataSource = subGroups.ToList();
                 gSubGroups.DataBind();
             }
             else
@@ -146,5 +147,24 @@ namespace com.reallifeministries
         }
 
         #endregion
+
+        protected void gSubGroups_RowSelected(object sender, RowEventArgs e)
+        {
+            var detailPage = GetAttributeValue( "DetailPage" );
+                if (! String.IsNullOrEmpty(detailPage) )
+                {
+                    NavigateToLinkedPage( "DetailPage", "GroupId", e.RowKeyId );
+
+                }
+                else
+                {
+                    var pf = RockPage.PageReference;
+                    var qs = pf.Parameters;
+                    qs.AddOrReplace("GroupId",e.RowKeyId.ToString());
+                    NavigateToPage( RockPage.Guid,qs );
+                }
+                
+        }
     }
+    
 }
