@@ -22,6 +22,7 @@ namespace com.reallifeministries
     [Description( "Lists all the sub groups of the given group & member counts" )]
 
     [GroupField( "Group", "Either pick a specific group or choose <none> to have group be determined by the groupId page parameter" )]
+    [GroupTypesField("Include Group Types","Only count members and groups from of group types",false)]
     [LinkedPage( "Detail Page","A detail page to go to when a group is clicked. Default same page", false )]
     public partial class SubGroupInfo : Rock.Web.UI.RockBlock, ISecondaryBlock
     {
@@ -113,31 +114,59 @@ namespace com.reallifeministries
             if (_group != null)
             {
                 var rockContext = new RockContext();
+                
 
                 var subGroups = rockContext.Groups.Where( g => g.ParentGroupId == _group.Id ).ToList();
                 if (subGroups.Count > 0)
                 {
-                    
+                    List<Guid> groupTypeIncludeGuids = GetAttributeValue( "IncludeGroupTypes" ).SplitDelimitedValues().AsGuidList();
                     var groupService = new GroupService( rockContext );
-                    var subGroupsAndSubMembers = (
-                        from g in subGroups
-                        let groupIds = (groupService.GetAllDescendents(g.Id).Select(a => a.Id).ToList().Concat(new List<int>(){g.Id}))
-                        select new {
-                            Group = g,
-                            Members = rockContext.GroupMembers.Where(m => groupIds.Contains(m.GroupId)).ToList()
-                        }
-                    );
 
-                    var subGroupMemberCounts = subGroupsAndSubMembers.OrderBy(a => a.Group.Name).Select(g => new {
-                        GroupId = g.Group.Id,
-                        Group = g.Group,
-                        InactiveMembers = g.Members.Where( m => m.GroupMemberStatus == GroupMemberStatus.Inactive ).Count(),
-                        PendingMembers = g.Members.Where( m => m.GroupMemberStatus == GroupMemberStatus.Pending ).Count(),
-                        ActiveMembers = g.Members.Where( m => m.GroupMemberStatus == GroupMemberStatus.Active ).Count()
-                    }).ToList();
-                        
-                    gSubGroups.DataSource = subGroupMemberCounts;
-                    gSubGroups.DataBind();
+                    if (groupTypeIncludeGuids.Any())
+                    {
+                        var subGroupsAndSubMembers = (
+                            from g in subGroups
+                            let groupIds = (groupService.GetAllDescendents( g.Id ).Select( a => a.Id ).ToList().Concat( new List<int>() { g.Id } ))
+                            select new
+                            {
+                                Group = g,
+                                Members = rockContext.GroupMembers.Where( m => groupIds.Contains( m.GroupId ) )
+                                                .Where(m=>groupTypeIncludeGuids.Contains(m.Group.GroupType.Guid)).ToList()
+                            });
+
+                        var subGroupMemberCounts = subGroupsAndSubMembers.OrderBy( a => a.Group.Name ).Select( g => new
+                        {
+                            GroupId = g.Group.Id,
+                            Group = g.Group,
+                            PendingMembers = g.Members.Where( m => m.GroupMemberStatus == GroupMemberStatus.Pending ).Count(),
+                            ActiveMembers = g.Members.Where( m => m.GroupMemberStatus == GroupMemberStatus.Active ).Count()
+                        } ).ToList();
+
+                        gSubGroups.DataSource = subGroupMemberCounts;
+                        gSubGroups.DataBind();
+                    }
+                    else
+                    {
+                        var subGroupsAndSubMembers = (
+                            from g in subGroups
+                            let groupIds = (groupService.GetAllDescendents( g.Id ).Select( a => a.Id ).ToList().Concat( new List<int>() { g.Id } ))
+                            select new
+                            {
+                                Group = g,
+                                Members = rockContext.GroupMembers.Where( m => groupIds.Contains( m.GroupId ) ).ToList()
+                            });
+
+                        var subGroupMemberCounts = subGroupsAndSubMembers.OrderBy( a => a.Group.Name ).Select( g => new
+                        {
+                            GroupId = g.Group.Id,
+                            Group = g.Group,
+                            PendingMembers = g.Members.Where( m => m.GroupMemberStatus == GroupMemberStatus.Pending ).Count(),
+                            ActiveMembers = g.Members.Where( m => m.GroupMemberStatus == GroupMemberStatus.Active ).Count()
+                        } ).ToList();
+
+                        gSubGroups.DataSource = subGroupMemberCounts;
+                        gSubGroups.DataBind();
+                    }
                 }  
                 else
                 {
