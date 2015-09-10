@@ -23,6 +23,7 @@ namespace com.reallifeministries
 
     [GroupField( "Group", "Either pick a specific group or choose <none> to have group be determined by the groupId page parameter" )]
     [GroupTypesField("Include Group Types","Only count members and groups from of group types",false)]
+    [TextField("Sub Group Term","What do you call a 'sub-group' (heading for sub-groups count)?",true,"Group")]
     [LinkedPage( "Detail Page","A detail page to go to when a group is clicked. Default same page", false )]
     public partial class SubGroupInfo : Rock.Web.UI.RockBlock, ISecondaryBlock
     {
@@ -30,6 +31,7 @@ namespace com.reallifeministries
 
         private Group _group = null;
         private bool _canView = false;
+        private string _groupTerm = null;
 
         #endregion
 
@@ -122,6 +124,9 @@ namespace com.reallifeministries
                     List<Guid> groupTypeIncludeGuids = GetAttributeValue( "IncludeGroupTypes" ).SplitDelimitedValues().AsGuidList();
                     var groupService = new GroupService( rockContext );
 
+                    gSubGroups.Columns[1].HeaderText = GetAttributeValue( "SubGroupTerm" ).Pluralize(); 
+                    ;
+
                     if (groupTypeIncludeGuids.Any())
                     {
                         var subGroupsAndSubMembers = (
@@ -167,6 +172,7 @@ namespace com.reallifeministries
                         gSubGroups.DataSource = subGroupMemberCounts;
                         gSubGroups.DataBind();
                     }
+                    
                 }  
                 else
                 {

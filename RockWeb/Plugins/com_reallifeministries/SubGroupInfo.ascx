@@ -21,7 +21,7 @@
                                 <Rock:RockBoundField DataField="Group.Name" HeaderText="Name" />
                                 <asp:TemplateField HeaderText="Groups">
                                     <ItemTemplate>
-                                        <i class="fa fa-info-circle" title="Coming Soon: Count of sub-groups"></i>
+                                        <i class="fa fa-info-circle" title="Coming Soon!"></i>
                                     </ItemTemplate>
                                 </asp:TemplateField>
                                 <Rock:RockBoundField DataField="ActiveMembers" HeaderText="Active" />
